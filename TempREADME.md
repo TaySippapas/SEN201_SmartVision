@@ -1,4 +1,5 @@
-Added by Team B
+
+Added by Teams A and B
 
 Team A edited here
 Team B edited here
@@ -8,4 +9,4 @@ Created 9/16/2025 5.12PM
 
 New last line
 
-Added by Team B
+Added by Teams A and B
