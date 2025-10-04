@@ -6,7 +6,7 @@ create table product
   name text not null,
   description text,
   price real not null check(price > 0),
-  total_sales integer default 0 check(total_sales >= 0),
+  total_sales integer default 0 check(total_sales > 0),
   quantity integer not null check(quantity > 0)
 );
 
