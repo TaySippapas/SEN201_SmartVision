@@ -1,0 +1,38 @@
+/*
+File: web.css
+Purpose: Styles for POS system
+Author: Jirapt Kulruchakorn
+Date: 30 September 2025
+*/
+
+/* Base styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  background: #2c3e50;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+}
+
+#main-nav {
+  display: flex;
+  justify-content: space-around;
+  background: #34495e;
+  padding: 0.5rem 0;
+}
+
+#main-nav a {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  transition: background 0.3s;
+}
+
+#main-nav a:hover {
+  background: #2c3e50;
+  border-radius: 5px;
+}
