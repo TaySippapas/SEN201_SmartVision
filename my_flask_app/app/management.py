@@ -1,7 +1,27 @@
-from app.storage import get_connection
-from datetime import datetime
+"""
+management.py
+
+This module provides functions for managing products in the database,
+including creating, modifying, and deleting product records.
+"""
+from app.helper import get_connection
 
 def create_product(name, description, price, quantity):
+    """
+    Create a new product in the database.
+
+    Inserts a new row into the 'product' table with the given information.
+    The 'total_sales' field is assumed to default to 0 in the table schema.
+
+    Args:
+        name (str): The product's name.
+        description (str): The product's description.
+        price (float): The product's price.
+        quantity (int): The quantity in stock.
+
+    Returns:
+        dict: A dictionary representing the newly created product record.
+    """
     conn = get_connection()
     cur = conn.cursor()
 
@@ -21,7 +41,24 @@ def create_product(name, description, price, quantity):
     conn.close()
     return dict(row)
 
+
 def modify_product(product_id, name=None, description=None, price=None, quantity=None):
+    """
+    Update an existing product in the database.
+
+    Only updates fields that are provided (non-None). Other fields remain unchanged.
+
+    Args:
+        product_id (int): The ID of the product to update.
+        name (str, optional): New name for the product.
+        description (str, optional): New description for the product.
+        price (float, optional): New price for the product.
+        quantity (int, optional): New quantity for the product.
+
+    Returns:
+        dict | None: The updated product record as a dictionary, or None if no fields were updated
+        or the product does not exist.
+    """
     conn = get_connection()
     cur = conn.cursor()
 
@@ -58,7 +95,17 @@ def modify_product(product_id, name=None, description=None, price=None, quantity
 
     return dict(row) if row else None
 
+
 def delete_product(product_id):
+    """
+    Delete a product from the database.
+
+    Args:
+        product_id (int): The ID of the product to delete.
+
+    Returns:
+        int: The number of rows deleted (1 if successful, 0 if not found).
+    """
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("DELETE FROM product WHERE product_id = ?", (product_id,))

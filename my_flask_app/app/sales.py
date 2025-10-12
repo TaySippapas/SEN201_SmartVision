@@ -1,4 +1,4 @@
-from app.storage import get_connection
+from my_flask_app.app.helper import get_connection
 from datetime import datetime            
 from collections import defaultdict             
 
