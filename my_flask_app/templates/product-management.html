@@ -1,0 +1,100 @@
+<!--
+  File: product-management.html
+  Purpose: Manage product list, add/edit/delete product, and view inventory
+  Author: Saritwatt
+  Date: 09 Oct 2025
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Product Management</title>
+  <link rel="stylesheet" href="product-management.css">
+</head>
+<body>
+  <!-- page container -->
+  <section class="product-management" id="product-management">
+    <!-- page header -->
+    <header class="page-header">
+      <h1 class="title">Product Management</h1>
+      <p class="subtitle">Create, edit, and track inventory</p>
+    </header>
+
+    <!-- toolbar -->
+    <div class="toolbar" id="toolbar">
+      <div class="toolbar-left">
+        <input id="search-input" class="search-input" type="search" placeholder="Search by code or name">
+      </div>
+      <div class="toolbar-right">
+        <button id="btn-create" class="btn btn-primary">Create Product</button>
+        <button id="btn-export" class="btn btn-ghost">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- table -->
+    <div class="table-wrap">
+      <table id="product-table">
+        <thead>
+          <tr>
+            <th>Code</th>
+            <th>Name</th>
+            <th class="num">Price</th>
+            <th class="num">Threshold</th>
+            <th class="num">Qty</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="product-tbody">
+          <!-- rows injected by js -->
+        </tbody>
+      </table>
+      <div id="empty-state" class="empty-state" hidden>
+        <p>No products yet.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- modal for create/edit product -->
+  <div id="product-modal" class="modal" role="dialog" aria-modal="true" hidden>
+    <div class="modal-backdrop" data-dismiss="modal"></div>
+    <div class="modal-card" role="document">
+      <header class="modal-header">
+        <h2 id="modal-title">Create Product</h2>
+        <button class="icon-btn" id="modal-close" aria-label="Close">&times;</button>
+      </header>
+      <form id="product-form" class="modal-body">
+        <div class="form-row">
+          <label for="code">Code</label>
+          <input id="code" name="code" required>
+        </div>
+        <div class="form-row">
+          <label for="name">Name</label>
+          <input id="name" name="name" required>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label for="price">Price</label>
+            <input id="price" name="price" type="number" step="0.01" min="0" required>
+          </div>
+          <div>
+            <label for="threshold">Low stock threshold</label>
+            <input id="threshold" name="threshold" type="number" step="1" min="0" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="qty">Quantity</label>
+          <input id="qty" name="qty" type="number" step="1" min="0" required>
+        </div>
+        <footer class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="btn-cancel">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save">Save</button>
+        </footer>
+      </form>
+    </div>
+  </div>
+
+  <script src="product-management.js"></script>
+</body>
+</html>
