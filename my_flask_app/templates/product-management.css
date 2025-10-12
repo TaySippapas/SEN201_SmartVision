@@ -1,0 +1,246 @@
+/* 
+  File: product-management.css
+  Purpose: Styling for product management UI
+  Author: Saritwatt
+  Date: 09 Oct 2025
+*/
+
+:root {
+  --bg: #f6f7fb;
+  --card: #ffffff;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --primary: #4a90e2;
+  --primary-600: #3b7ec8;
+  --danger: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgba(2, 6, 23, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: "Inter", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  color: var(--text);
+  background-color: var(--bg);
+  margin: 0;
+  padding: 24px;
+  line-height: 1.4;
+}
+
+.page-header .title {
+  margin: 0 0 4px 0;
+  font-size: 1.6rem;
+}
+
+.page-header .subtitle {
+  margin: 0 0 12px 0;
+  color: var(--muted);
+}
+
+.product-management {
+  background-color: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  width: 360px;
+  max-width: 100%;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+.btn {
+  appearance: none;
+  border: none;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: #ffffff;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-600);
+}
+
+.btn-ghost {
+  background-color: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background-color: #f3f4f6;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 820px;
+}
+
+thead th {
+  background-color: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 0.82rem;
+}
+
+tbody td {
+  border-bottom: 1px solid var(--border);
+  padding: 12px;
+  vertical-align: middle;
+}
+
+tbody tr:hover {
+  background-color: #fafafa;
+}
+
+th.num, td.num {
+  text-align: right;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  background-color: #ffffff;
+}
+
+.badge .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.dot-success { background-color: var(--success); }
+.dot-warning { background-color: var(--warning); }
+.dot-danger { background-color: var(--danger); }
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.empty-state {
+  padding: 16px;
+  text-align: center;
+  color: var(--muted);
+}
+
+/* modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 100;
+}
+
+.modal[hidden] { display: none; }
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.modal-card {
+  position: relative;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  width: min(560px, 92vw);
+  max-height: 86vh;
+  overflow: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-body {
+  padding: 18px;
+}
+
+.modal-footer {
+  margin-top: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.form-row {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.form-row.two-col {
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.form-row input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  .form-row.two-col { grid-template-columns: 1fr; }
+}
