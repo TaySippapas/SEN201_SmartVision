@@ -1,0 +1,67 @@
+﻿pylint helper.py
+************* Module app.helper
+helper.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+
+
+-----------------------------------
+Your code has been rated at 8.33/10
+
+
+pylint sales.py     
+************* Module app.sales
+sales.py:9:29: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:10:35: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:11:30: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:38:48: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:43:54: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:44:20: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:47:37: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:48:49: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:51:0: C0301: Line too long (104/100) (line-too-long)
+sales.py:52:28: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:56:49: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:58:27: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:60:27: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:63:57: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:64:20: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:72:29: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:74:60: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:75:71: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:76:19: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:79:36: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:81:46: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:82:51: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:83:31: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:86:0: C0301: Line too long (118/100) (line-too-long)
+sales.py:91:27: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:93:41: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:94:56: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:95:51: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:96:38: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:97:35: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:104:45: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:105:62: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:116:38: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:120:35: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:129:51: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:131:41: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:141:21: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:147:62: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:148:48: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:153:16: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:159:58: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:162:26: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:163:23: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:164:54: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:166:20: C0303: Trailing whitespace (trailing-whitespace)
+sales.py:13:0: R0914: Too many local variables (26/15) (too-many-locals)
+sales.py:162:11: W0718: Catching too general exception Exception (broad-exception-caught)
+sales.py:13:0: R0911: Too many return statements (7/6) (too-many-return-statements)
+sales.py:13:0: R0912: Too many branches (14/12) (too-many-branches)
+sales.py:9:0: C0411: standard import "datetime.datetime" should be placed before first party import "app.helper.get_connection"  (wrong-import-order)
+sales.py:10:0: C0411: standard import "collections.defaultdict" should be placed before first party import "app.helper.get_connection"  (wrong-import-order)
+sales.py:11:0: C0411: standard import "typing.DefaultDict" should be placed before first party import "app.helper.get_connection"  (wrong-import-order)
+
+
+------------------------------------------------------------------
+Your code has been rated at 1.03/10 (previous run: 4.04/10, -3.00)

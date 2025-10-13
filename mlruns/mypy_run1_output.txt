@@ -1,0 +1,5 @@
+﻿mypy *.py
+sales.py:8: error: Cannot find implementation or library stub for module named "my_flask_app.app.helper"  [import-not-found]
+sales.py:8: note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#missing-imports
+sales.py:42: error: Need type annotation for "combined"  [var-annotated]
+Found 2 errors in 1 file (checked 5 source files)
