@@ -1,6 +1,13 @@
+"""
+helper.py
+
+Provides `get_connection()` to create a connection to the SQLite,
+returning rows as dictionary-like objects using `sqlite3.Row`.
+"""
 import sqlite3
 
 DB_NAME = "database/mydatabase.db"
+
 
 def get_connection():
     """
