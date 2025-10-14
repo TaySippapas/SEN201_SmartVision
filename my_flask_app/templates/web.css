@@ -5,58 +5,92 @@ Author: Jirapt Kulruchakorn
 Date: 30 September 2025
 */
 
-/* Base styles */
+/* Base layout */
 body {
   margin: 0;
   font-family: Arial, sans-serif;
 }
 
+/* Header */
 header {
   background: #2c3e50;
   color: white;
   text-align: center;
-  padding: 1rem;
+  padding: 1.5rem;
 }
 
-#main-nav {
+/* Card Layout */
+#card-container {
+  padding: 2rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #34495e;
-  padding: 0.5rem 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  max-width: 1000px;
+  margin: 0 auto;
 }
 
-.nav-left {
-  display: flex;
-  gap: 1rem;
-  flex: 1;
-  min-width: 0;
+/* Individual Card */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+  flex: 1 1 250px;
+  max-width: 260px;
 }
 
-.nav-right {
-  display: flex;
-  align-items: center;
+.card-hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
 }
 
-#main-nav a {
+.card h2 {
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.card p {
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* Buttons for links */
+.button {
+  display: inline-block;
+  background: #3499db;
   color: white;
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
   text-decoration: none;
-  padding: 0.5rem 0.75rem;
-  border-radius: 5px;
+  font-weight: bold;
   transition: background 0.3s;
 }
 
-#main-nav a:visited {
-  color: white;
-}
-
-.admin-button {
-  background: #3499db;
-  font-weight: bold;
-}
-
-.admin-button:hover {
+.button:hover{
   background: #2980b9;
+}
+
+.back-button {
+  background: #7f8c8d;
+}
+
+.back-button:hover {
+  background: #666;
+}
+
+.content {
+  max-width: 800px;
+  margin: 2rem auto;
+  text-align: center;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 footer {
