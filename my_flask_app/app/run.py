@@ -1,45 +1,20 @@
-# test_sell.py
-from app.management import create_product  # your existing create function
-from app.sales import sell_product         # your new sell function
-from my_flask_app.app.helper import get_connection
+from flask import Flask, render_template
+from app.management import products_bp  # import the Blueprint
 
+app = Flask(
+    __name__,
+    template_folder="../templates",  # relative path to templates
+    static_folder="../static"        # optional if your static folder is outside
+)
+app.register_blueprint(products_bp)
 
-def show_products():
-    """Helper to display all products from DB."""
-    with get_connection() as conn:
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM product")
-        rows = cur.fetchall()
-        print("\n📦 Current Products:")
-        for row in rows:
-            print(dict(row))
-
-
-def main():
-    # 1️⃣ Create sample products
-    p1 = create_product("Coca Cola", "Refreshing soda", 1.5, 50)
-    p2 = create_product("Pepsi", "Cola drink", 1.4, 30)
-    p3 = create_product("Fanta", "Orange soda", 1.2, 20)
-
-    print("✅ Products created:")
-    print(p1)
-    print(p2)
-    print(p3)
-
-    show_products()
-
-    # 2️⃣ Sell one product (simulate transaction)
-    print("\n🛒 Selling some products...")
-    result1 = sell_product(product_id=p1["product_id"], quantity_sold=5, payment_method="cash")
-    print("Result 1:", result1)
-
-    result2 = sell_product(product_id=p3["product_id"], quantity_sold=18, payment_method="credit")
-    print("Result 2:", result2)
-
-    # 3️⃣ Show updated product table
-    show_products()
-
-
+# Frontend route
+@app.route("/product-management.html")
+def product_page():
+    """Render the product management HTML page."""
+    return render_template("product-management.html")
+@app.route("/")
+def home_page():
+     return render_template("main.html")
 if __name__ == "__main__":
-    main()
-
+    app.run(debug=True)

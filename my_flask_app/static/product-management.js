@@ -1,28 +1,19 @@
 /* 
   File: product-management.js
-  Purpose: Control product CRUD actions
-  Author: Saritwatt
+  Purpose: Control product CRUD actions via Flask backend API
+  Author: Saritwatt (updated by ChatGPT)
 */
 
 /* utilities */
-const storageKey = "sv_products";
-function loadProducts() 
-{
-  const raw = localStorage.getItem(storageKey);
-  if (!raw) { return []; 
-    
-  }
-  try { return JSON.parse(raw); } catch (e) { return []; }
-}
-function saveProducts(products) {
-  localStorage.setItem(storageKey, JSON.stringify(products));
-}
 function currency(n) {
-  return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number(n).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 function computeStatus(p) {
-  if (p.qty <= 0) { return { label: "out of stock", level: "danger" }; }
-  if (p.qty <= p.threshold) { return { label: "low stock", level: "warning" }; }
+  if (p.quantity <= 0) return { label: "out of stock", level: "danger" };
+  if (p.quantity <= 10) return { label: "low stock", level: "warning" };
   return { label: "in stock", level: "success" };
 }
 
@@ -41,26 +32,51 @@ const form = document.querySelector("#product-form");
 const btnCancel = document.querySelector("#btn-cancel");
 
 /* state */
-let editingCode = null;
+let editingProduct = null;
 
-/* initial demo data (only on first run) */
-(function seed() {
-  const already = loadProducts();
-  if (already.length > 0) { return; }
-  const sample = [
-    { code: "P001", name: "Classic Burger", price: 89, threshold: 10, qty: 22 },
-    { code: "P002", name: "French Fries", price: 49, threshold: 15, qty: 9 },
-    { code: "P003", name: "Iced Tea", price: 35, threshold: 20, qty: 0 }
-  ];
-  saveProducts(sample);
-})();
+/* API helpers */
+const API_BASE = "http://127.0.0.1:5000/api/products";
+
+async function fetchProducts() {
+  const res = await fetch(API_BASE);
+  return res.ok ? await res.json() : [];
+}
+
+async function createProduct(data) {
+  const res = await fetch(API_BASE, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return await res.json();
+}
+
+async function updateProduct(id, data) {
+  const res = await fetch(`${API_BASE}/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  return await res.json();
+}
+
+async function deleteProduct(id) {
+  const ok = confirm("Delete product ID " + id + "?");
+  if (!ok) return;
+
+  const res = await fetch(`${API_BASE}/${id}`, { method: "DELETE" });
+  if (res.ok) renderRows(searchInput.value);
+}
 
 /* rendering */
-function renderRows(filterText = "") {
-  const products = loadProducts();
+async function renderRows(filterText = "") {
+  const products = await fetchProducts();
   const q = filterText.trim().toLowerCase();
   const list = q
-    ? products.filter(p => (p.code + " " + p.name).toLowerCase().includes(q))
+    ? products.filter(
+        (p) =>
+          (p.name + " " + (p.description || "")).toLowerCase().includes(q)
+      )
     : products;
 
   tbody.innerHTML = "";
@@ -70,26 +86,25 @@ function renderRows(filterText = "") {
   }
   emptyState.hidden = true;
 
-  list.forEach(p => {
+  list.forEach((p) => {
     const tr = document.createElement("tr");
 
-    const tdCode = document.createElement("td");
-    tdCode.textContent = p.code;
+    const tdId = document.createElement("td");
+    tdId.textContent = p.product_id;
 
     const tdName = document.createElement("td");
     tdName.textContent = p.name;
+
+    const tdDesc = document.createElement("td");
+    tdDesc.textContent = p.description;
 
     const tdPrice = document.createElement("td");
     tdPrice.className = "num";
     tdPrice.textContent = currency(p.price);
 
-    const tdTh = document.createElement("td");
-    tdTh.className = "num";
-    tdTh.textContent = p.threshold;
-
     const tdQty = document.createElement("td");
     tdQty.className = "num";
-    tdQty.textContent = p.qty;
+    tdQty.textContent = p.quantity;
 
     const tdStatus = document.createElement("td");
     const st = computeStatus(p);
@@ -99,8 +114,7 @@ function renderRows(filterText = "") {
     dot.className = "dot dot-" + st.level;
     const text = document.createElement("span");
     text.textContent = st.label;
-    badge.appendChild(dot);
-    badge.appendChild(text);
+    badge.append(dot, text);
     tdStatus.appendChild(badge);
 
     const tdAct = document.createElement("td");
@@ -115,55 +129,44 @@ function renderRows(filterText = "") {
     const btnDel = document.createElement("button");
     btnDel.className = "btn btn-ghost";
     btnDel.textContent = "Delete";
-    btnDel.addEventListener("click", () => deleteProduct(p.code));
+    btnDel.addEventListener("click", () => deleteProduct(p.product_id));
 
-    group.appendChild(btnEdit);
-    group.appendChild(btnDel);
+    group.append(btnEdit, btnDel);
     tdAct.appendChild(group);
 
-    tr.appendChild(tdCode);
-    tr.appendChild(tdName);
-    tr.appendChild(tdPrice);
-    tr.appendChild(tdTh);
-    tr.appendChild(tdQty);
-    tr.appendChild(tdStatus);
-    tr.appendChild(tdAct);
+    tr.append(tdId, tdName, tdDesc, tdPrice, tdQty, tdStatus, tdAct);
     tbody.appendChild(tr);
   });
 }
 
 /* modal control */
-function openModal(mode, product) {
+function openModal(mode, product = null) {
   modal.hidden = false;
   document.body.style.overflow = "hidden";
+
   if (mode === "create") {
     modalTitle.textContent = "Create Product";
     form.reset();
-    editingCode = null;
+    editingProduct = null;
   } else {
     modalTitle.textContent = "Edit Product";
-    form.code.value = product.code;
     form.name.value = product.name;
+    form.description.value = product.description;
     form.price.value = product.price;
-    form.threshold.value = product.threshold;
-    form.qty.value = product.qty;
-    editingCode = product.code;
+    form.quantity.value = product.quantity;
+    editingProduct = product;
   }
-  form.code.readOnly = editingCode !== null; // do not change primary key
-  form.code.style.backgroundColor = editingCode ? "#f3f4f6" : "#ffffff";
-  form.code.tabIndex = editingCode ? -1 : 0;
+
   form.name.focus();
 }
+
 function closeModal() {
   modal.hidden = true;
   document.body.style.overflow = "";
 }
 
 modal.addEventListener("click", (e) => {
-  const target = e.target;
-  if (target.classList.contains("modal-backdrop")) {
-    closeModal();
-  }
+  if (e.target.classList.contains("modal-backdrop")) closeModal();
 });
 modalClose.addEventListener("click", closeModal);
 btnCancel.addEventListener("click", closeModal);
@@ -172,53 +175,34 @@ btnCancel.addEventListener("click", closeModal);
 btnCreate.addEventListener("click", () => openModal("create"));
 searchInput.addEventListener("input", (e) => renderRows(e.target.value));
 
-form.addEventListener("submit", (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const code = form.code.value.trim();
-  const name = form.name.value.trim();
-  const price = Number(form.price.value);
-  const threshold = Number(form.threshold.value);
-  const qty = Number(form.qty.value);
+  const data = {
+    name: form.name.value.trim(),
+    description: form.description.value.trim(),
+    price: Number(form.price.value),
+    quantity: Number(form.quantity.value),
+  };
 
-  const products = loadProducts();
-  if (editingCode === null) 
-    {
-    const exists = products.some(p => p.code === code);
-    if (exists) 
-      {
-      alert("Code already exists.");
-      return;
-    }
-    products.push({ code, name, price, threshold, qty });
-  } 
-  else 
-  {
-    const idx = products.findIndex(p => p.code === editingCode);
-    if (idx >= 0) 
-      {
-      products[idx] = { code, name, price, threshold, qty };
-    }
+  if (editingProduct === null) {
+    await createProduct(data);
+  } else {
+    await updateProduct(editingProduct.product_id, data);
   }
-  saveProducts(products);
+
   closeModal();
   renderRows(searchInput.value);
 });
 
-function deleteProduct(code) 
-{
-  const ok = confirm("Delete product " + code + "?");
-  if (!ok) { return; }
-  const products = loadProducts().filter(p => p.code !== code);
-  saveProducts(products);
-  renderRows(searchInput.value);
-}
-
 /* export csv */
-btnExport.addEventListener("click", () => 
-  {
-  const products = loadProducts();
-  const header = ["code", "name", "price", "threshold", "qty"];
-  const lines = [header.join(",")].concat(products.map(p => [p.code, p.name, p.price, p.threshold, p.qty].join(",")));
+btnExport.addEventListener("click", async () => {
+  const products = await fetchProducts();
+  const header = ["product_id", "name", "description", "price", "quantity"];
+  const lines = [header.join(",")].concat(
+    products.map((p) =>
+      [p.product_id, p.name, p.description, p.price, p.quantity].join(",")
+    )
+  );
   const blob = new Blob([lines.join("\n")], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
