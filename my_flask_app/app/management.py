@@ -10,7 +10,7 @@ import sqlite3
 # -----------------------------
 # DB helper
 # -----------------------------
-DB_FILE = "database/database.db"
+DB_FILE = "database/mydatabase.db"
 
 def get_connection():
     conn = sqlite3.connect(DB_FILE)
