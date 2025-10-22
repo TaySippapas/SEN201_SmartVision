@@ -4,3 +4,10 @@ __pycache__/
 
 # Virtual environment
 .venv/
+
+# Analytic_tool
+analytic_tool/
+
+# macOS system files
+.DS_Store
+**/.DS_Store

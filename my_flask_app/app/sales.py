@@ -99,25 +99,54 @@ def low_stock_warnings(
     return warnings
 
 
-def sell_products(items: List[dict], payment_method: str = "cash", low_stock_threshold: int = 5,):
+def sell_products(items: List[dict], payment_method: str = "cash", low_stock_threshold: int = 5):
     """
     Sell multiple products in a single transaction.
 
     Args:
-        items: Each item has {"product_id": int, "quantity": int}.
-        payment_method: Payment method label, default "cash".
-        low_stock_threshold: Warn when remaining stock <= this number.
-
-    Returns:
-        dict: Success payload or {"error": <code>, "detail": <message>}.
+        items: Each item has either {"product_id": int, "quantity": int}
+               or {"name": str, "quantity": int}. Name is case-insensitive.
     """
-    combined, err = combine_items(items)
-    if err:
-        return err
-
-    product_ids = list(combined.keys())
     conn = get_connection()
     try:
+        cur = conn.cursor()
+
+        # --- NEW: resolve names to product_id (no other functions changed) ---
+        normalized_items: List[dict] = []
+        for it in items:
+            if "product_id" in it and it["product_id"] is not None:
+                normalized_items.append({"product_id": int(it["product_id"]), "quantity": it["quantity"]})
+                continue
+
+            # If no product_id, try by name (case-insensitive exact match)
+            name = it.get("name")
+            if not name or not str(name).strip():
+                return {"error": "invalid_item", "detail": f"Missing product_id or name: {it!r}"}
+
+            cur.execute(
+                """
+                SELECT product_id
+                FROM product
+                WHERE LOWER(name) = LOWER(?)
+                """,
+                (str(name).strip(),),
+            )
+            rows = cur.fetchall()
+            if not rows:
+                return {"error": "product_not_found", "detail": f"No product named '{name}'"}
+            if len(rows) > 1:
+                # Optional: if you want to allow duplicates, pick the first or raise a clearer error
+                return {"error": "ambiguous_name", "detail": f"Multiple products named '{name}'"}
+
+            normalized_items.append({"product_id": int(rows[0]["product_id"]), "quantity": it["quantity"]})
+        # --- END NEW ---
+
+        # From here on, NOTHING ELSE CHANGES — reuse your existing pipeline
+        combined, err = combine_items(normalized_items)
+        if err:
+            return err
+
+        product_ids = list(combined.keys())
         cur = conn.cursor()
 
         prod_by_id, err = fetch_products(cur, product_ids)
@@ -131,8 +160,12 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
         line_summaries, total_amount = calc_lines_and_total(prod_by_id, combined)
         now_str = datetime.now().isoformat(timespec="seconds")
 
-        # Insert receipt header
+        # Insert receipt header (restore your original INSERT here)
         cur.execute(
+            """
+            INSERT INTO transaction (total_amount, timestamp, payment_method)
+            VALUES (?, ?, ?)
+            """,
             (total_amount, now_str, payment_method),
         )
         transaction_id = cur.lastrowid
