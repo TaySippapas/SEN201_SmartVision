@@ -11,3 +11,6 @@ __pycache__/
 
 # Analytic_tool
 analytic_tool/
+
+# Database
+database/
