@@ -13,4 +13,4 @@ __pycache__/
 analytic_tool/
 
 # Database
-database/
+database/mydatabase.db
