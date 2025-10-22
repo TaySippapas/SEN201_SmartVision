@@ -1,0 +1,77 @@
+/*
+File: checkout.css
+Purpose: Styles for Checkout Page
+Author: Jirapt Kulruchakorn
+Date: 14 October 2025
+*/
+
+/* Checkout Form */
+.checkout-form {
+    margin: 1.5rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkout-form label {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.checkout-form input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.checkout-form input[type="text"] {
+    width: 200px;
+}
+
+.checkout-form input[type="number"] {
+    width: 80px;
+}
+
+/* Cart Table */
+.cart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5rem;
+}
+
+.cart-table th,
+.cart-table td {
+    border: 1px solid #ddd;
+    padding: 0.75rem;
+    text-align: center;
+    text-transform: capitalize;
+}
+
+.cart-table th {
+    background-color: #2c3e50;
+    color: white;
+}
+
+/* Quantity input */
+.quantity-input {
+    width: 70px;
+    padding: 0.4rem;
+    text-align: center;
+}
+
+/* Checkout actions */
+.checkout-actions {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+#cancel-button {
+    background: #e74c3c;
+}
+
+#cancel-button:hover {
+    background: #c0392b;
+}

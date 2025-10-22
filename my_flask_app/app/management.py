@@ -1,114 +1,123 @@
 """
 management.py
 
-This module provides functions for managing products in the database,
-including creating, modifying, and deleting product records.
+Product CRUD logic and API endpoints as a Flask Blueprint.
 """
-from app.helper import get_connection
 
+from flask import Blueprint, jsonify, request
+import sqlite3
+
+# -----------------------------
+# DB helper
+# -----------------------------
+DB_FILE = "database/mydatabase.db"
+
+def get_connection():
+    conn = sqlite3.connect(DB_FILE)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# -----------------------------
+# CRUD functions
+# -----------------------------
 def create_product(name, description, price, quantity):
-    """
-    Create a new product in the database.
-
-    Inserts a new row into the 'product' table with the given information.
-    The 'total_sales' field is assumed to default to 0 in the table schema.
-
-    Args:
-        name (str): The product's name.
-        description (str): The product's description.
-        price (float): The product's price.
-        quantity (int): The quantity in stock.
-
-    Returns:
-        dict: A dictionary representing the newly created product record.
-    """
     conn = get_connection()
     cur = conn.cursor()
-
-    # Insert product; total_sales defaults to 0
     cur.execute(
-        """
-        INSERT INTO product (name, description, price, quantity)
-        VALUES (?, ?, ?, ?)
-        """,
-        (name, description, price, quantity)
+        "INSERT INTO product (name, description, price, quantity) VALUES (?, ?, ?, ?)",
+        (name, description, price, quantity),
     )
-
     conn.commit()
     product_id = cur.lastrowid
-    cur.execute("SELECT * FROM product WHERE product_id = ?", (product_id,))
-    row = cur.fetchone()
     conn.close()
-    return dict(row)
-
+    return {"product_id": product_id, "name": name, "description": description, "price": price, "quantity": quantity}
 
 def modify_product(product_id, name=None, description=None, price=None, quantity=None):
-    """
-    Update an existing product in the database.
-
-    Only updates fields that are provided (non-None). Other fields remain unchanged.
-
-    Args:
-        product_id (int): The ID of the product to update.
-        name (str, optional): New name for the product.
-        description (str, optional): New description for the product.
-        price (float, optional): New price for the product.
-        quantity (int, optional): New quantity for the product.
-
-    Returns:
-        dict | None: The updated product record as a dictionary, or None if no fields were updated
-        or the product does not exist.
-    """
     conn = get_connection()
     cur = conn.cursor()
 
-    # Only update fields provided (ignore None)
-    fields = []
+    updates = []
     values = []
 
     if name is not None:
-        fields.append("name = ?")
+        updates.append("name = ?")
         values.append(name)
     if description is not None:
-        fields.append("description = ?")
+        updates.append("description = ?")
         values.append(description)
     if price is not None:
-        fields.append("price = ?")
+        updates.append("price = ?")
         values.append(price)
     if quantity is not None:
-        fields.append("quantity = ?")
+        updates.append("quantity = ?")
         values.append(quantity)
 
-    if not fields:
+    if not updates:
         conn.close()
-        return None  # Nothing to update
+        return None
 
     values.append(product_id)
-    sql = f"UPDATE product SET {', '.join(fields)} WHERE product_id = ?"
+    sql = f"UPDATE product SET {', '.join(updates)} WHERE product_id = ?"
     cur.execute(sql, values)
     conn.commit()
-
-    # Fetch updated row
     cur.execute("SELECT * FROM product WHERE product_id = ?", (product_id,))
     row = cur.fetchone()
     conn.close()
-
     return dict(row) if row else None
 
-
 def delete_product(product_id):
-    """
-    Delete a product from the database.
-
-    Args:
-        product_id (int): The ID of the product to delete.
-
-    Returns:
-        int: The number of rows deleted (1 if successful, 0 if not found).
-    """
     conn = get_connection()
     cur = conn.cursor()
     cur.execute("DELETE FROM product WHERE product_id = ?", (product_id,))
     conn.commit()
+    deleted = cur.rowcount
     conn.close()
-    return cur.rowcount
+    return deleted
+
+def get_all_products():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM product")
+    rows = [dict(row) for row in cur.fetchall()]
+    conn.close()
+    return rows
+
+# -----------------------------
+# Blueprint
+# -----------------------------
+products_bp = Blueprint("products", __name__, url_prefix="/api/products")
+
+@products_bp.route("", methods=["GET"])
+def list_products():
+    return jsonify(get_all_products()), 200
+
+@products_bp.route("", methods=["POST"])
+def add_product():
+    data = request.get_json()
+    if not data or not all(k in data for k in ("name", "description", "price", "quantity")):
+        return jsonify({"error": "Missing required fields"}), 400
+    product = create_product(
+        data["name"], data["description"], float(data["price"]), int(data["quantity"])
+    )
+    return jsonify(product), 201
+
+@products_bp.route("/<int:product_id>", methods=["PUT"])
+def update_product(product_id):
+    data = request.get_json() or {}
+    product = modify_product(
+        product_id,
+        name=data.get("name"),
+        description=data.get("description"),
+        price=data.get("price"),
+        quantity=data.get("quantity")
+    )
+    if product is None:
+        return jsonify({"error": "Product not found or no fields updated"}), 404
+    return jsonify(product), 200
+
+@products_bp.route("/<int:product_id>", methods=["DELETE"])
+def remove_product(product_id):
+    deleted = delete_product(product_id)
+    if deleted == 0:
+        return jsonify({"error": "Product not found"}), 404
+    return jsonify({"message": "Product deleted successfully"}), 200

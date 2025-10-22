@@ -1,0 +1,77 @@
+<!--
+File: checkout.html
+Purpose: Checkout page for the Mom and Pop POS system.
+Author: Jirapat Kulruchakorn
+Date: 14 October 2025
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Mom and Pop POS</title>
+    <link rel="stylesheet" href="web.css">
+    <link rel="stylesheet" href="checkout.css">
+    <!-- Page Script -->
+    <script src="checkout.js" defer></script>
+</head>
+
+<body>
+
+    <!-- Page Header -->
+    <header>
+    <h1>Sales and Checkout</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content">
+      <section aria-label="new sale">
+        <h2>New Sale</h2>
+        <p>Scan or enter a product to start a new transaction</p>
+
+        <!-- Checkout Form -->
+        <div class="checkout-form">
+          <label for="product-code">Product code: </label>
+          <input type="text" id="product-code" name="product-code" placeholder="Enter product name">
+          <label for="product-qty">Quantity: </label>
+          <input type="number" id="product-qty" name="product-qty" value="1" min="1">
+          <button id="add-item-button" class="button" type="button">Add item</button>
+        </div>
+
+        <!-- Cart Table -->
+        <table class="cart-table" aria-label="cart items">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="cart-body"></tbody>
+          <tfoot>
+            <tr>
+              <th colspan="3" style="text-align: right;">Grand Total</th>
+              <th id="total-amount">$0.00</th>
+              <th></th>
+            </tr>
+          </tfoot>
+        </table>
+
+            <!-- Checkout Buttons -->
+        <div class ="checkout-buttons">
+          <button id="pay-button" class="button">Process Payment</button>
+          <button id="cancel-button" class="button">Cancel Sale</button>
+          <a href="main.html" class="button back-button" aria-label="Back to Main Page">Back to Main Page</a>
+        </div>
+      </section>
+    </main>
+
+    <!-- Page Footer -->
+    <footer>
+      <p>&copy; Mom and Pop POS System 2025, SmartVision</p>
+    </footer>
+</body>
+</html>
