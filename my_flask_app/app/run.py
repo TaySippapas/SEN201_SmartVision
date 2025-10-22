@@ -13,8 +13,15 @@ app.register_blueprint(products_bp)
 def product_page():
     """Render the product management HTML page."""
     return render_template("product-management.html")
+
 @app.route("/")
-def home_page():
+def home_page(): 
      return render_template("main.html")
+ 
+@app.route("/checkout.html")
+def checkout_page():
+    """Render the checkout HTML page."""
+    return render_template("checkout.html")
+
 if __name__ == "__main__":
     app.run(debug=True)
