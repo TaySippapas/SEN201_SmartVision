@@ -67,11 +67,11 @@
       <form id="product-form" class="modal-body">
         <div class="form-row">
           <label for="name">Name</label>
-          <input id="name" name="name" required>
+          <input id="name" name="name" pattern="[A-Za-z\s]+" title="Letters only" required>
         </div>
         <div class="form-row">
           <label for="description">Description</label>
-          <input id="description" name="description">
+          <input id="description" name="description" pattern="[A-Za-z\s]+" title="Letters only">
         </div>
         <div class="form-row">
           <label for="price">Price</label>
