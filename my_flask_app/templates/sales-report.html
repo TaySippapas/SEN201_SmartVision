@@ -1,0 +1,51 @@
+<!--
+  File: sales-report.html
+  Purpose: Sales report with date filters and CSV export
+  Author: Saritwatt
+  Date: 22 Oct 2025
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sales Report • SmartVision POS</title>
+  <link rel="stylesheet" href="reports.css" />
+</head>
+<body>
+  <header class="app-bar"><h1 class="brand">SmartVision POS</h1></header>
+
+  <main class="container">
+    <h2 class="page-title">Sales Report</h2>
+    <p class="page-subtitle">Filter by date range and export</p>
+
+    <div class="toolbar">
+      <label>From <input id="from" type="date" class="input" /></label>
+      <label>To <input id="to" type="date" class="input" /></label>
+      <select id="group" class="input">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+      </select>
+      <button id="btn-apply" class="btn">Apply</button>
+      <button id="btn-export" class="btn btn-primary">Export CSV</button>
+      <a href="reports.html" class="btn" aria-label="Back">Back</a>
+    </div>
+
+    <section class="table-wrap">
+      <table id="sales-table">
+        <thead>
+          <tr>
+            <th>Period</th><th>Orders</th><th>Items</th>
+            <th>Subtotal</th><th>Tax</th><th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="sales-tbody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer">© SmartVision 2025</footer>
+  <script src="sales-report.js"></script>
+</body>
+</html>

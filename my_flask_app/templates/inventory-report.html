@@ -1,0 +1,44 @@
+<!--
+  File: inventory-report.html
+  Purpose: Inventory report with low-stock view and CSV export
+  Author: Saritwatt
+  Date: 22 Oct 2025
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inventory Report • SmartVision POS</title>
+  <link rel="stylesheet" href="reports.css" />
+</head>
+<body>
+  <header class="app-bar"><h1 class="brand">SmartVision POS</h1></header>
+
+  <main class="container">
+    <h2 class="page-title">Inventory Report</h2>
+    <p class="page-subtitle">Current stock levels and valuation</p>
+
+    <div class="toolbar">
+      <label><input id="only-low" type="checkbox" /> Show low/out-of-stock only</label>
+      <button id="btn-export-inv" class="btn btn-primary">Export CSV</button>
+      <a href="reports.html" class="btn" aria-label="Back">Back</a>
+    </div>
+
+    <section class="table-wrap">
+      <table id="inv-table">
+        <thead>
+          <tr>
+            <th>Code</th><th>Name</th><th>Qty</th><th>Threshold</th>
+            <th>Unit Price</th><th>Value</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer">© SmartVision 2025</footer>
+  <script src="inventory-report.js"></script>
+</body>
+</html>
