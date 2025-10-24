@@ -4,7 +4,7 @@ sales.py
 This module create a sales, validate product, check stock,
 updates inventory, records transaction details.
 """
-
+from flask import Blueprint, request, jsonify
 from collections import defaultdict
 from datetime import datetime
 from typing import DefaultDict, Dict, Iterable, List, Tuple
@@ -132,10 +132,16 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
         now_str = datetime.now().isoformat(timespec="seconds")
 
         # Insert receipt header
+        # Insert receipt header (main transaction)
         cur.execute(
+            """
+            INSERT INTO total_transaction (total_amount, date_and_time, payment_method)
+            VALUES (?, ?, ?)
+            """,
             (total_amount, now_str, payment_method),
-        )
+        )   
         transaction_id = cur.lastrowid
+
 
         # Insert receipt lines
         for line in line_summaries:
@@ -177,3 +183,38 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
         return {"error": "db_error", "detail": str(exc)}
     finally:
         conn.close()
+        
+# -----------------------------
+# Blueprint
+# -----------------------------    
+
+sales_bp = Blueprint("sales", __name__, url_prefix="/api/sales")
+
+@sales_bp.route("/checkout", methods=["POST"])
+def checkout_sale():
+    data = request.get_json(force=True)
+    if not data or "items" not in data:
+        return jsonify({"error": "Missing 'items' field"}), 400
+
+    result = sell_products(data["items"])
+    if "error" in result:
+        return jsonify(result), 400
+
+    return jsonify(result), 200
+
+@sales_bp.route("/product/<int:product_id>", methods=["GET"])
+def get_product(product_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT product_id, name, price, quantity FROM product WHERE product_id = ?",
+        (product_id,)
+    )
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return jsonify({"error": "Product not found"}), 404
+
+    return jsonify(dict(row)), 200
+

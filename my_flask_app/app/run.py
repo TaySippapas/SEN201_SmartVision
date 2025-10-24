@@ -1,5 +1,6 @@
 from flask import Flask, render_template
-from app.management import products_bp  # import the Blueprint
+from app.management import products_bp 
+from app.sales import sales_bp
 
 app = Flask(
     __name__,
@@ -7,6 +8,8 @@ app = Flask(
     static_folder="../static"        # optional if your static folder is outside
 )
 app.register_blueprint(products_bp)
+
+app.register_blueprint(sales_bp)
 
 # Frontend route
 @app.route("/product-management.html")
