@@ -25,6 +25,13 @@ def home_page():
 def checkout_page():
     """Render the checkout HTML page."""
     return render_template("checkout.html")
-
+@app.route("/reports.html")
+def report_page():
+    """Render the checkout HTML page."""
+    return render_template("reports.html")
+@app.route("/sales-report.html")
+def sales_report_page():
+    """Render the checkout HTML page."""
+    return render_template("sales-report.html")
 if __name__ == "__main__":
     app.run(debug=True)
