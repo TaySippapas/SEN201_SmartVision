@@ -2,7 +2,7 @@
   File: checkout2.js
   Purpose: Sales & checkout UI logic for POS. Supports entering product
            by code (numeric) or by name with autocomplete suggestions.
-  Author: SmartVision Team
+  Author: Jirapt Kulruchakorn
   Last-Updated: 25 Oct 2025
 */
 
