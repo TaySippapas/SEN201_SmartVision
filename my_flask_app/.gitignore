@@ -15,10 +15,6 @@ analytic_tool/
 # Database
 database/mydatabase.db
 
-
-# macOS
-.DS_Store
-
 # macOS
 .DS_Store
 
