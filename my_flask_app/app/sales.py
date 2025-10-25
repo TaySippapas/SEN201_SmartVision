@@ -2,7 +2,7 @@
   File: sales.py
   Purpose: Manage sales operations for the POS — validation, stock checks,
            inventory updates, and transaction recording.
-  Author: SmartVision Team
+  Author: Jirat Kositchaiwat
   Last-Updated: 25 Oct 2025
 """
 
