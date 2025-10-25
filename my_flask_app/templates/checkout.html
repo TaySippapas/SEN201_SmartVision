@@ -1,77 +1,113 @@
 <!--
-File: checkout.html
-Purpose: Checkout page for the Mom and Pop POS system.
-Author: Jirapat Kulruchakorn
-Date: 14 October 2025
+  File: checkout2.html
+  Purpose: Checkout page for the Mom and Pop POS system.
+  Author: SmartVision Team
+  Last-Updated: 25 Oct 2025
 -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Checkout - Mom and Pop POS</title>
-    <link rel="stylesheet" href="static/main.css">
-    <link rel="stylesheet" href="static/checkout.css">
-    <!-- Page Script -->
-    <script src="static/checkout.js" defer></script>
-</head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Checkout — Mom and Pop POS</title>
 
+  <!-- If you open this file directly, keep plain paths below. If you serve via Flask templates,
+       you can switch to url_for('static', ...). -->
+  <link rel="stylesheet" href="static/main.css" />
+  <link rel="stylesheet" href="static/checkout.css" />
+
+  <script src="static/checkout.js" defer></script>
+</head>
 <body>
 
-    <!-- Page Header -->
-    <header>
+  <!-- Header -->
+  <header>
     <h1>Sales and Checkout</h1>
-    </header>
+  </header>
 
-    <!-- Main Content -->
-    <main class="content">
-      <section aria-label="new sale">
-        <h2>New Sale</h2>
-        <p>Scan or enter a product to start a new transaction</p>
+  <!-- Main Content -->
+  <main class="content">
+    <section aria-label="new sale">
+      <h2>New Sale</h2>
+      <p>Scan a barcode, enter a code, or type a name to start a new transaction.</p>
 
-        <!-- Checkout Form -->
-        <div class="checkout-form">
-          <label for="product-code">Product code: </label>
-          <input type="text" id="product-code" name="product-code" placeholder="Enter product name">
-          <label for="product-qty">Quantity: </label>
-          <input type="number" id="product-qty" name="product-qty" value="1" min="1">
-          <button id="add-item-button" class="button" type="button">Add item</button>
+      <!-- Checkout Form -->
+      <div class="checkout-form">
+        <label for="product-name">Product:</label>
+        <div class="omnibox">
+          <input
+            type="text"
+            id="product-name"
+            placeholder="Enter product name or code"
+            autocomplete="off"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="suggestions"
+          />
+          <div
+            id="suggestions"
+            class="omnibox-panel"
+            role="listbox"
+            aria-label="Product suggestions">
+          </div>
         </div>
 
-        <!-- Cart Table -->
-        <table class="cart-table" aria-label="cart items">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Quantity</th>
-              <th>Price</th>
-              <th>Total</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="cart-body"></tbody>
-          <tfoot>
-            <tr>
-              <th colspan="3" style="text-align: right;">Grand Total</th>
-              <th id="total-amount">$0.00</th>
-              <th></th>
-            </tr>
-          </tfoot>
-        </table>
+        <label for="product-qty">Quantity:</label>
+        <input
+          type="number"
+          id="product-qty"
+          value="1"
+          min="1"
+          inputmode="numeric"
+          pattern="[0-9]*"
+        />
 
-            <!-- Checkout Buttons -->
-        <div class ="checkout-buttons">
-          <button id="pay-button" class="button">Process Payment</button>
-          <button id="cancel-button" class="button">Cancel Sale</button>
-          <a href="main.html" class="button back-button" aria-label="Back to Main Page">Back to Main Page</a>
-        </div>
-      </section>
-    </main>
+        <!-- NEW: Payment method -->
+        <label for="payment-type">Payment:</label>
+        <select id="payment-type" name="payment-type">
+          <option value="cash" selected>Cash</option>
+          <option value="credit">Credit / Debit Card</option>
+          <option value="qr">QR Payment</option>
+          <option value="wallet">E-Wallet</option>
+        </select>
 
-    <!-- Page Footer -->
-    <footer>
-      <p>&copy; Mom and Pop POS System 2025, SmartVision</p>
-    </footer>
+        <button id="add-item-button" class="button" type="button">Add Item</button>
+      </div>
+
+      <!-- Cart Table -->
+      <table class="cart-table" aria-label="cart items">
+        <thead>
+          <tr>
+            <th scope="col">Item</th>
+            <th scope="col">Quantity</th>
+            <th scope="col">Price</th>
+            <th scope="col">Total</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="cart-body"></tbody>
+        <tfoot>
+          <tr>
+            <th scope="row" colspan="3" style="text-align: right;">Grand Total</th>
+            <th id="total-amount">$0.00</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Buttons -->
+      <div class="checkout-buttons">
+        <button id="pay-button" class="button" type="button">Process Payment</button>
+        <button id="cancel-button" class="button" type="button">Cancel Sale</button>
+        <a href="/" class="button back-button" aria-label="Back to Main Page">Back to Main Page</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Mom and Pop POS System, SmartVision</p>
+  </footer>
 </body>
 </html>

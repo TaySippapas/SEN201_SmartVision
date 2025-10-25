@@ -75,3 +75,86 @@ Date: 14 October 2025
 #cancel-button:hover {
     background: #c0392b;
 }
+
+/* === Google-like omnibox === */
+.omnibox {
+  position: relative;
+  display: inline-block;
+}
+
+.omnibox input#product-name {
+  width: 260px;            /* adjust to taste */
+  padding-right: 2.2rem;   /* room for trailing icon if you add one later */
+}
+
+/* floating dropdown */
+.omnibox-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+
+  background: #24333a;           /* dark slate */
+  color: #ecf1f3;
+  border-radius: 10px;
+  margin-top: 6px;
+  padding: 6px 0;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.06);
+
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 1000;
+  display: none;                 /* hidden by default */
+}
+
+/* each row */
+.omnibox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  line-height: 1.2;
+}
+
+.omnibox-item:hover,
+.omnibox-item.is-active {
+  background: rgba(255,255,255,0.08);
+}
+
+/* leading icon circle (search/history) */
+.omnibox-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: inline-block;
+  flex: 0 0 18px;
+  position: relative;
+}
+
+/* tiny magnifier glyph */
+.omnibox-icon::after {
+  content: "";
+  position: absolute;
+  left: 5px; top: 5px;
+  width: 6px; height: 6px;
+  border: 2px solid #ecf1f3;
+  border-radius: 50%;
+}
+.omnibox-icon::before {
+  content: "";
+  position: absolute;
+  left: 11px; top: 11px;
+  width: 6px; height: 2px;
+  background: #ecf1f3;
+  transform: rotate(45deg);
+  border-radius: 1px;
+}
+
+/* primary & secondary text */
+.omnibox-text { display: flex; flex-direction: column; }
+.omnibox-primary { font-weight: 600; }
+.omnibox-secondary { opacity: 0.8; font-size: 0.85rem; }
