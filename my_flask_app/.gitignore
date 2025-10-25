@@ -18,3 +18,15 @@ database/mydatabase.db
 
 # macOS
 .DS_Store
+
+# macOS
+.DS_Store
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3

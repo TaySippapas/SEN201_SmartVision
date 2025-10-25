@@ -11,7 +11,7 @@ Date: 30 September 2025
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mom and Pop POS</title>
-    <link rel="stylesheet" href="static/main.css">
+    <link rel="stylesheet" href="{{url_for('static',filename='main.css')}}">
 </head>
 
 <body>
@@ -38,7 +38,7 @@ Date: 30 September 2025
       <section class="card">
         <h2>Reports</h2>
         <p>View sales reports, inventory reports, and customer insights</p>
-        <a href="." class="button">Reports</a>
+        <a href="reports.html" class="button">Reports</a>
       </section>
     </main>
 
