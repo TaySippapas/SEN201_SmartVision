@@ -1,23 +1,20 @@
-<!--
-  File: sales-report.html
-  Purpose: Sales report with date filters and CSV export
-  Author: Saritwatt
-  Date: 22 Oct 2025
--->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sales Report • SmartVision POS</title>
-  <link rel="stylesheet" href="static/reports.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='reports.css') }}">
 </head>
+
 <body>
-  <header class="app-bar"><h1 class="brand">SmartVision POS</h1></header>
+  <header class="app-bar">
+    <h1 class="brand">SmartVision POS</h1>
+  </header>
 
   <main class="container">
     <h2 class="page-title">Sales Report</h2>
-    <p class="page-subtitle">Filter by date range and export</p>
+    <p class="page-subtitle">Filter by date range, group, and view transaction details.</p>
 
     <div class="toolbar">
       <label>From <input id="from" type="date" class="input" /></label>
@@ -27,18 +24,19 @@
         <option value="weekly">Weekly</option>
         <option value="monthly">Monthly</option>
       </select>
-      <button id="btn-apply" class="btn">Apply</button>
-      <button id="btn-export" class="btn btn-primary">Export CSV</button>
-      <a href="/" class="btn" aria-label="Back">Back</a>
+      <button id="btn-apply" class="btn btn-primary">Apply</button>
+      <button id="btn-export" class="btn">Export CSV</button>
+      <a href="/" class="btn">Back</a>
     </div>
 
     <section class="table-wrap">
-      <table id="sales-table">
+      <table class="table table-striped">
         <thead>
           <tr>
             <th>Period</th>
-            <th>Quantity Sold</th>  <!-- new column -->
+            <th>Quantity Sold</th>
             <th>Total Amount</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="sales-tbody"></tbody>
@@ -46,7 +44,29 @@
     </section>
   </main>
 
+  <!-- Modal for transaction details -->
+  <div id="details-modal" class="modal">
+    <div class="modal-content">
+      <h3>Transactions for <span id="modal-period"></span></h3>
+      <table id="details-table">
+        <thead>
+          <tr>
+            <th>Transaction ID</th>
+            <th>Date & Time</th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody id="details-body"></tbody>
+      </table>
+      <button id="close-modal">Close</button>
+    </div>
+  </div>
+
   <footer class="footer">© SmartVision 2025</footer>
-  <script src="static/sales-report.js"></script>
+
+  <script src="{{ url_for('static', filename='sales-report.js') }}"></script>
 </body>
 </html>

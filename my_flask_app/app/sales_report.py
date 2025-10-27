@@ -3,81 +3,113 @@ from app.helper import get_connection
 
 sales_report_bp = Blueprint('sales_report', __name__, url_prefix='/sales-report')
 
+
 def query_sales_report(start_date=None, end_date=None, group_by='daily'):
-    """
-    Return total revenue and quantity sold per period (day/week/month).
-    """
-    conn = get_connection()
-    cur = conn.cursor()
+    """Return total revenue and quantity sold per period (day/week/month)."""
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
 
-    # Base SQL: join each_transaction with total_transaction
-    sql = """
-    SELECT 
-        date(datetime(tt.date_and_time)) AS period,
-        SUM(tt.total_amount) AS total_amount,
-        SUM(et.quantity) AS total_quantity
-    FROM each_transaction et
-    JOIN total_transaction tt ON et.transaction_id = tt.transaction_id
-    WHERE 1=1
-    """
-    params = []
-
-    # Date filters
-    if start_date:
-        sql += " AND date(datetime(tt.date_and_time)) >= date(?)"
-        params.append(start_date)
-    if end_date:
-        sql += " AND date(datetime(tt.date_and_time)) <= date(?)"
-        params.append(end_date)
-
-    # Grouping
-    if group_by == 'daily':
-        sql += " GROUP BY date(datetime(tt.date_and_time)) ORDER BY date(datetime(tt.date_and_time)) ASC"
-    elif group_by == 'weekly':
         sql = """
-        SELECT strftime('%Y-W%W', datetime(tt.date_and_time)) AS period,
-               SUM(tt.total_amount) AS total_amount,
-               SUM(et.quantity) AS total_quantity
+        SELECT 
+            date(tt.date_and_time) AS period,
+            SUM(tt.total_amount) AS total_amount,
+            SUM(et.quantity) AS total_quantity
         FROM each_transaction et
         JOIN total_transaction tt ON et.transaction_id = tt.transaction_id
         WHERE 1=1
         """
-        if start_date:
-            sql += " AND date(datetime(tt.date_and_time)) >= date(?)"
-        if end_date:
-            sql += " AND date(datetime(tt.date_and_time)) <= date(?)"
-        sql += " GROUP BY strftime('%Y-W%W', datetime(tt.date_and_time)) ORDER BY strftime('%Y-W%W', datetime(tt.date_and_time)) ASC"
-    elif group_by == 'monthly':
-        sql = """
-        SELECT strftime('%Y-%m', datetime(tt.date_and_time)) AS period,
-               SUM(tt.total_amount) AS total_amount,
-               SUM(et.quantity) AS total_quantity
-        FROM each_transaction et
-        JOIN total_transaction tt ON et.transaction_id = tt.transaction_id
-        WHERE 1=1
-        """
-        if start_date:
-            sql += " AND date(datetime(tt.date_and_time)) >= date(?)"
-        if end_date:
-            sql += " AND date(datetime(tt.date_and_time)) <= date(?)"
-        sql += " GROUP BY strftime('%Y-%m', datetime(tt.date_and_time)) ORDER BY strftime('%Y-%m', datetime(tt.date_and_time)) ASC"
+        params = []
 
-    cur.execute(sql, params)
-    rows = cur.fetchall()
-    conn.close()
-    return rows
+        # Date filters
+        if start_date:
+            sql += " AND date(tt.date_and_time) >= date(?)"
+            params.append(start_date)
+        if end_date:
+            sql += " AND date(tt.date_and_time) <= date(?)"
+            params.append(end_date)
+
+        # Grouping
+        if group_by == 'daily':
+            sql += " GROUP BY date(tt.date_and_time) ORDER BY date(tt.date_and_time) ASC"
+        elif group_by == 'weekly':
+            sql += " GROUP BY strftime('%Y-W%W', tt.date_and_time) ORDER BY strftime('%Y-W%W', tt.date_and_time) ASC"
+        elif group_by == 'monthly':
+            sql += " GROUP BY strftime('%Y-%m', tt.date_and_time) ORDER BY strftime('%Y-%m', tt.date_and_time) ASC"
+
+        cur.execute(sql, params)
+        rows = cur.fetchall()
+        conn.close()
+        return rows
+
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return []
+
 
 @sales_report_bp.route('/report-json')
 def sales_report_json():
     start_date = request.args.get('from')
     end_date = request.args.get('to')
     group_by = request.args.get('group', 'daily')
+
     rows = query_sales_report(start_date, end_date, group_by)
     result = [
         {
             'period': r['period'],
-            'total_amount': r['total_amount'],
-            'total_quantity': r['total_quantity']
+            'total_amount': r['total_amount'] or 0,
+            'total_quantity': r['total_quantity'] or 0
         } for r in rows
     ]
     return jsonify(result)
+
+
+@sales_report_bp.route('/details')
+def sales_report_details():
+    """Return all transactions for a given period (day)."""
+    period = request.args.get('period')
+    if not period:
+        return jsonify({'error': 'Missing period'}), 400
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+
+        # Join each_transaction with product to get item name and price
+        sql = """
+        SELECT 
+            tt.transaction_id,
+            tt.date_and_time,
+            p.name AS item_name,
+            et.quantity,
+            p.price,
+            (et.quantity * p.price) AS total
+        FROM each_transaction et
+        JOIN total_transaction tt ON et.transaction_id = tt.transaction_id
+        JOIN product p ON et.product_id = p.product_id
+        WHERE strftime('%Y-%m-%d', tt.date_and_time) = ?
+        ORDER BY tt.date_and_time ASC
+        """
+
+        cur.execute(sql, (period,))
+        rows = cur.fetchall()
+        conn.close()
+
+        result = [
+            {
+                'transaction_id': r['transaction_id'],
+                'date_and_time': r['date_and_time'],
+                'item_name': r['item_name'],
+                'quantity': r['quantity'],
+                'price': r['price'],
+                'total': r['total']
+            } for r in rows
+        ]
+
+        return jsonify(result)
+
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
