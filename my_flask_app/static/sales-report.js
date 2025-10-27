@@ -23,18 +23,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const detailsBody = document.getElementById("details-body");
   const closeModal = document.getElementById("close-modal");
 
+    // === ADD: helper to build query string without empty values ===
+  function qs(obj) {
+  const p = new URLSearchParams();
+  Object.entries(obj).forEach(([k, v]) => {
+    if (v !== undefined && v !== null && String(v).trim() !== "") p.append(k, v);
+  });
+    return p.toString();
+  }
+
   // --------------------
   // Load report data
   // --------------------
   btnApply.addEventListener("click", async () => {
-    const params = new URLSearchParams({
-      from: from.value,
-      to: to.value,
-      group: group.value
+    const paramsStr = qs({ 
+        from: from.value, 
+        to: to.value, 
+        group: group.value 
     });
 
     try {
-      const response = await fetch(`/sales-report/report-json?${params.toString()}`);
+      const url = `/sales-report/report-json${paramsStr ? `?${paramsStr}` : ""}`;
+      const response = await fetch(url);
       if (!response.ok) throw new Error("Failed to load sales report.");
 
       const data = await response.json();
@@ -49,11 +59,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Export CSV
   // --------------------
   btnExport.addEventListener("click", () => {
-    const params = new URLSearchParams({
-      from: from.value,
-      to: to.value,
-      group: group.value
-    });
+    const paramsStr = qs({ from: from.value, to: to.value, group: group.value });
     window.location.href = `/sales-report/export?${params.toString()}`;
   });
 
@@ -91,6 +97,20 @@ document.addEventListener("DOMContentLoaded", () => {
       });
     });
   }
+
+  (async () => {
+    try {
+      const paramsStr = qs({ group: group.value || "daily" });
+      const url = `/sales-report/report-json${paramsStr ? `?${paramsStr}` : ""}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Failed to load sales report.");
+      const data = await response.json();
+      renderReportTable(data);
+    } catch (err) {
+      console.error(err);
+      // optional: alert("Error loading initial sales report data.");
+    }
+  })();
 
   // --------------------
   // View transactions per period (modal)
