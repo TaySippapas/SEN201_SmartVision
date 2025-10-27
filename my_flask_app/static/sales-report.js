@@ -1,13 +1,14 @@
-/* 
-  File: sales-report.js
-  Purpose: Sales report logic (filtering, export, and view transactions in modal)
-  Author: Saritwatt
-  Date: 27 Oct 2025
-*/
+// File: static/sales-report.js
+// Purpose: Sales report logic with auto-load and CSV export
+// Author: Saritwatt
+// Date: 27 Oct 2025
 
 // Format numbers for currency
 function fmt(n) {
-  return Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return Number(n).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -18,49 +19,64 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnExport = document.getElementById("btn-export");
   const tbody = document.getElementById("sales-tbody");
 
-  const modal = document.getElementById("details-modal");
-  const modalPeriod = document.getElementById("modal-period");
-  const detailsBody = document.getElementById("details-body");
-  const closeModal = document.getElementById("close-modal");
-
-    // === ADD: helper to build query string without empty values ===
-  function qs(obj) {
-  const p = new URLSearchParams();
-  Object.entries(obj).forEach(([k, v]) => {
-    if (v !== undefined && v !== null && String(v).trim() !== "") p.append(k, v);
-  });
-    return p.toString();
-  }
+  let currentData = []; // Store latest data for CSV export
 
   // --------------------
-  // Load report data
+  // Load sales report data
   // --------------------
-  btnApply.addEventListener("click", async () => {
-    const paramsStr = qs({ 
-        from: from.value, 
-        to: to.value, 
-        group: group.value 
+  async function loadReport() {
+    const params = new URLSearchParams({
+      from: from.value,
+      to: to.value,
+      group: group.value,
     });
 
     try {
-      const url = `/sales-report/report-json${paramsStr ? `?${paramsStr}` : ""}`;
-      const response = await fetch(url);
+      const response = await fetch(`/sales-report/report-json?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to load sales report.");
-
       const data = await response.json();
+      currentData = data;
       renderReportTable(data);
     } catch (err) {
       console.error(err);
-      alert("Error loading sales report data.");
+      tbody.innerHTML = `<tr><td colspan="3" class="text-center">Error loading sales report</td></tr>`;
     }
-  });
+  }
 
   // --------------------
-  // Export CSV
+  // Apply filter manually
+  // --------------------
+  btnApply.addEventListener("click", loadReport);
+
+  // --------------------
+  // Export current table as CSV
   // --------------------
   btnExport.addEventListener("click", () => {
-    const paramsStr = qs({ from: from.value, to: to.value, group: group.value });
-    window.location.href = `/sales-report/export?${params.toString()}`;
+    if (!currentData.length) {
+      alert("No data available to export.");
+      return;
+    }
+
+    const header = ["Period", "Quantity Sold", "Total Amount"];
+    const rows = currentData.map((r) => [
+      r.period,
+      r.total_quantity,
+      fmt(r.total_amount),
+    ]);
+
+    // Build CSV text
+    let csvContent =
+      "data:text/csv;charset=utf-8," +
+      [header, ...rows].map((e) => e.join(",")).join("\n");
+
+    // Create download link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "sales_report.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   });
 
   // --------------------
@@ -68,105 +84,24 @@ document.addEventListener("DOMContentLoaded", () => {
   // --------------------
   function renderReportTable(data) {
     tbody.innerHTML = "";
-
     if (!data.length) {
-      tbody.innerHTML = `<tr><td colspan="4" class="text-center">No data found for selected range</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="3" class="text-center">No data found for selected range</td></tr>`;
       return;
     }
 
-    data.forEach(row => {
+    data.forEach((row) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${row.period}</td>
         <td>${row.total_quantity}</td>
         <td>${fmt(row.total_amount)}</td>
-        <td>
-          <button class="btn btn-small btn-view" data-period="${row.period}">
-            View Transactions
-          </button>
-        </td>
       `;
       tbody.appendChild(tr);
     });
-
-    // Add click handler for "View Transactions"
-    document.querySelectorAll(".btn-view").forEach(button => {
-      button.addEventListener("click", async e => {
-        const period = e.target.dataset.period;
-        await viewTransactions(period);
-      });
-    });
-  }
-
-  (async () => {
-    try {
-      const paramsStr = qs({ group: group.value || "daily" });
-      const url = `/sales-report/report-json${paramsStr ? `?${paramsStr}` : ""}`;
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to load sales report.");
-      const data = await response.json();
-      renderReportTable(data);
-    } catch (err) {
-      console.error(err);
-      // optional: alert("Error loading initial sales report data.");
-    }
-  })();
-
-  // --------------------
-  // View transactions per period (modal)
-  // --------------------
-  async function viewTransactions(period) {
-    try {
-      const response = await fetch(`/sales-report/details?period=${encodeURIComponent(period)}`);
-      if (!response.ok) throw new Error("Failed to fetch transactions.");
-
-      const transactions = await response.json();
-
-      if (!transactions.length) {
-        alert(`No transactions found for ${period}.`);
-        return;
-      }
-
-      // Set modal period title
-      modalPeriod.textContent = period;
-
-      // Clear previous rows
-      detailsBody.innerHTML = "";
-
-      // Populate modal table
-      transactions.forEach(t => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${t.transaction_id}</td>
-          <td>${t.date_and_time}</td>
-          <td>${t.item_name}</td>
-          <td>${t.quantity}</td>
-          <td>${fmt(t.price)}</td>
-          <td>${fmt(t.total)}</td>
-        `;
-        detailsBody.appendChild(tr);
-      });
-
-      // Show modal
-      modal.style.display = "flex";
-
-    } catch (err) {
-      console.error(err);
-      alert("Error fetching transactions.");
-    }
   }
 
   // --------------------
-  // Close modal
+  // Load report automatically on page load
   // --------------------
-  closeModal.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
-
-  // Close modal if click outside content
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) {
-      modal.style.display = "none";
-    }
-  });
+  loadReport();
 });

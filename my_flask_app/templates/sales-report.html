@@ -14,7 +14,7 @@
 
   <main class="container">
     <h2 class="page-title">Sales Report</h2>
-    <p class="page-subtitle">Filter by date range, group, and view transaction details.</p>
+    <p class="page-subtitle">Filter by date range and group.</p>
 
     <div class="toolbar">
       <label>From <input id="from" type="date" class="input" /></label>
@@ -36,7 +36,6 @@
             <th>Period</th>
             <th>Quantity Sold</th>
             <th>Total Amount</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="sales-tbody"></tbody>
@@ -44,28 +43,7 @@
     </section>
   </main>
 
-  <!-- Modal for transaction details -->
-  <div id="details-modal" class="modal">
-    <div class="modal-content">
-      <h3>Transactions for <span id="modal-period"></span></h3>
-      <table id="details-table">
-        <thead>
-          <tr>
-            <th>Transaction ID</th>
-            <th>Date & Time</th>
-            <th>Item</th>
-            <th>Qty</th>
-            <th>Price</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody id="details-body"></tbody>
-      </table>
-      <button id="close-modal">Close</button>
-    </div>
-  </div>
-
-  <footer class="footer">© Mom and Pop POS System 2025, SmartVision</footer>
+  <footer class="footer">© SmartVision 2025</footer>
 
   <script src="{{ url_for('static', filename='sales-report.js') }}"></script>
 </body>
