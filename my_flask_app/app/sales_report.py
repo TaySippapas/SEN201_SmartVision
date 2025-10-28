@@ -65,4 +65,4 @@ def sales_report_json():
     return jsonify(result)
 
 
-
+ 
