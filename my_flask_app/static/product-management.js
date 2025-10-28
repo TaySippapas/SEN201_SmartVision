@@ -184,6 +184,11 @@ form.addEventListener("submit", async (e) => {
     quantity: Number(form.quantity.value),
   };
 
+  if (data.price <= 0) {
+    alert("Price must be greater than 0.");
+    return; // stop form submission
+  }
+
   if (editingProduct === null) {
     await createProduct(data);
   } else {
