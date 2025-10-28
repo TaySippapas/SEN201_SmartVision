@@ -6,16 +6,7 @@ Product CRUD logic and API endpoints as a Flask Blueprint.
 
 from flask import Blueprint, jsonify, request
 import sqlite3
-
-# -----------------------------
-# DB helper
-# -----------------------------
-DB_FILE = "database/mydatabase.db"
-
-def get_connection():
-    conn = sqlite3.connect(DB_FILE)
-    conn.row_factory = sqlite3.Row
-    return conn
+from app.helper import get_connection
 
 # -----------------------------
 # CRUD functions (with rollback)
