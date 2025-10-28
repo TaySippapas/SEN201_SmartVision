@@ -1,8 +1,3 @@
-// File: static/sales-report.js
-// Purpose: Sales report logic with auto-load and CSV export
-// Author: Saritwatt
-// Date: 27 Oct 2025
-
 // Format numbers for currency
 function fmt(n) {
   return Number(n).toLocaleString(undefined, {
@@ -20,6 +15,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const tbody = document.getElementById("sales-tbody");
 
   let currentData = []; // Store latest data for CSV export
+
+  // --------------------
+  // Date picker constraints
+  // --------------------
+  from.addEventListener("change", () => {
+    if (from.value) to.min = from.value;
+    else to.min = "";
+  });
+
+  to.addEventListener("change", () => {
+    if (to.value) from.max = to.value;
+    else from.max = "";
+  });
 
   // --------------------
   // Load sales report data
@@ -64,12 +72,10 @@ document.addEventListener("DOMContentLoaded", () => {
       fmt(r.total_amount),
     ]);
 
-    // Build CSV text
     let csvContent =
       "data:text/csv;charset=utf-8," +
       [header, ...rows].map((e) => e.join(",")).join("\n");
 
-    // Create download link
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
