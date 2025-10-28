@@ -1,25 +1,22 @@
-"""
-helper.py
-
-Provides `get_connection()` to create a connection to the SQLite,
-returning rows as dictionary-like objects using `sqlite3.Row`.
-"""
 import sqlite3
-
-DB_NAME = "database/mydatabase.db"
-
+import os
+import sys
 
 def get_connection():
-    """
-    Create and return a connection to the SQLite database.
+    try:
+        if getattr(sys, 'frozen', False):
+            # Running from PyInstaller bundle
+            base_dir = sys._MEIPASS
+        else:
+            # Running normally in Python
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    This function connects to the database defined by `DB_NAME`
-    and configures the connection to return rows as dictionary-like
-    objects (using `sqlite3.Row`).
+        db_path = os.path.join(base_dir, 'database', 'mydatabase.db')
+        print(f"[DEBUG] Using database path: {db_path}")
 
-    Returns:
-        sqlite3.Connection: A connection object to the SQLite database.
-    """
-    conn = sqlite3.connect(DB_NAME)
-    conn.row_factory = sqlite3.Row
-    return conn
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        return conn
+    except Exception as e:
+        print(f"[ERROR] Failed to connect to DB: {e}")
+        raise
