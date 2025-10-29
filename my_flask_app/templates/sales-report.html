@@ -29,23 +29,44 @@
       <a href="/" class="btn">Back</a>
     </div>
 
+    <!-- Summary Table -->
     <section class="table-wrap">
+      <h3>Summary Report</h3>
       <table class="table table-striped">
         <thead>
           <tr>
             <th>Period</th>
             <th>Quantity Sold</th>
             <th>Total Amount</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody id="sales-tbody"></tbody>
       </table>
     </section>
+
+    <!-- Transactions Modal -->
+    <div id="transactions-modal" class="modal">
+      <div class="modal-content">
+        <span id="modal-close" class="modal-close">&times;</span>
+        <h3>Transactions</h3>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Quantity</th>
+              <th>Price</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="transactions-tbody"></tbody>
+        </table>
+      </div>
+    </div>
   </main>
 
   <footer class="footer">© SmartVision 2025</footer>
 
-  <!-- Link to external JS -->
   <script src="{{ url_for('static', filename='sales-report.js') }}"></script>
 </body>
 </html>

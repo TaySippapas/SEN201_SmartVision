@@ -21,9 +21,9 @@ create table total_transaction
 create table each_transaction 
 (
   each_transaction_id integer primary key autoincrement,
+  name text not null,
   transaction_id integer not null,
-  product_id integer not null,
+  price real not null check(price > 0),
   quantity integer not null default 1 check(quantity > 0),
-  foreign key (transaction_id) references total_transaction(transaction_id),
-  foreign key (product_id) references product(product_id)
+  foreign key (transaction_id) references total_transaction(transaction_id)
 );

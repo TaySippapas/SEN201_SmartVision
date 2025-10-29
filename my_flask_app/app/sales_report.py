@@ -13,7 +13,7 @@ def query_sales_report(start_date=None, end_date=None, group_by='daily'):
         sql = """
         SELECT 
             date(tt.date_and_time) AS period,
-            SUM(tt.total_amount) AS total_amount,
+            SUM(et.quantity * et.price) AS total_amount,
             SUM(et.quantity) AS total_quantity
         FROM each_transaction et
         JOIN total_transaction tt ON et.transaction_id = tt.transaction_id
@@ -64,5 +64,51 @@ def sales_report_json():
     ]
     return jsonify(result)
 
+@sales_report_bp.route('/transactions-json')
+def transactions_json():
+    start_date = request.args.get('from')
+    end_date = request.args.get('to')
+
+    conn = get_connection()
+    cur = conn.cursor()
+
+    sql = """
+        SELECT 
+            date(tt.date_and_time) AS period,
+            et.name,
+            SUM(et.quantity) AS total_quantity,
+            et.price,
+            SUM(et.quantity * et.price) AS subtotal
+        FROM total_transaction tt
+        JOIN each_transaction et ON tt.transaction_id = et.transaction_id
+        WHERE 1=1
+    """
+    params = []
+
+    if start_date:
+        sql += " AND date(tt.date_and_time) >= date(?)"
+        params.append(start_date)
+    if end_date:
+        sql += " AND date(tt.date_and_time) <= date(?)"
+        params.append(end_date)
+
+    sql += " GROUP BY period, et.name, et.price ORDER BY period ASC"
+
+    cur.execute(sql, params)
+    rows = cur.fetchall()
+    conn.close()
+
+    result = [
+        {
+            "period": r["period"],
+            "name": r["name"],
+            "quantity": r["total_quantity"],
+            "price": r["price"],
+            "subtotal": r["subtotal"]
+        }
+        for r in rows
+    ]
+
+    return jsonify(result)
 
  

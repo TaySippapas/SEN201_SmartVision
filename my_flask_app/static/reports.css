@@ -148,6 +148,33 @@ input[type="date"] { min-width: 160px; }
   padding: 14px;
   font-size: 14px;
 }
+/* Modal overlay */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.5);
+}
+
+/* Modal content box */
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 6px;
+  width: 80%;
+  max-width: 800px;
+}
+
+/* Close button */
+.modal-close {
+  float: right;
+  font-size: 28px;
+  cursor: pointer;
+}
 
 /* Responsive tweaks */
 @media (max-width: 720px) {

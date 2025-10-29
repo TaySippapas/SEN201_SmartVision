@@ -137,10 +137,10 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
     for line in line_summaries:
       cur.execute(
         """
-        INSERT INTO each_transaction (transaction_id, product_id, quantity)
-        VALUES (?, ?, ?)
+        INSERT INTO each_transaction (transaction_id, name, price, quantity)
+        VALUES (?, ?, ?, ?)
         """,
-        (transaction_id, line["product_id"], line["quantity"]),
+        (transaction_id, line["name"], line["unit_price"], line["quantity"]),
       )
 
     # Update inventory
