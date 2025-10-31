@@ -1,5 +1,5 @@
 <!--
-  File: checkout2.html
+  File: checkout.html
   Purpose: Checkout page for the Mom and Pop POS system.
   Author: Jirapt Kulruchakorn
   Last-Updated: 25 Oct 2025
@@ -104,6 +104,20 @@
       </div>
     </section>
   </main>
+
+  <!-- QR Modal -->
+  <div id="qr-modal" class="qr-modal" aria-hidden="true">
+    <div class="qr-dialog" role="dialog" aria-modal="true" aria-labelledby="qr-title">
+      <h3 id="qr-title">Scan to Pay</h3>
+      <p class="qr-amount" id="qr-amount"></p>
+      <img id="qr-image" alt="QR code to pay" />
+      <div class="qr-actions">
+      <button id="qr-cancel" class="button">Cancel</button>
+      <button id="qr-paid" class="button">Mark as Paid</button>
+      </div>
+      <p id="qr-status" class="qr-status">Waiting for payment…</p>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer>

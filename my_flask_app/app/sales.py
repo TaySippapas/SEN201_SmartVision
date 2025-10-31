@@ -1,16 +1,18 @@
 """
   File: sales.py
   Purpose: Manage sales operations for the POS — validation, stock checks,
-           inventory updates, and transaction recording.
+           inventory updates, and transaction recording, including QR flow.
   Author: Jirat Kositchaiwat
-  Last-Updated: 25 Oct 2025
+  Last-Updated: 31 Oct 2025
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_file
 from collections import defaultdict
 from datetime import datetime
 from typing import DefaultDict, Dict, Iterable, List, Tuple
 from app.helper import get_connection
+import base64, io, time
+import qrcode
 
 # ======================================================================
 # Utility Functions
@@ -92,6 +94,30 @@ def low_stock_warnings(prod_by_id: Dict[int, dict], combined: Dict[int, int], th
       warnings.append(f"⚠️ Stock for '{name}' is low ({remaining} left)")
   return warnings
 
+
+# ======================================================================
+# QR Helpers / In-memory TX status (replace with DB when ready)
+# ======================================================================
+
+# Track QR payment status in memory for now
+# Structure: {transaction_id: {"status": "pending|paid|canceled|expired", "amount": float, "created": ts}}
+TX_STATUS: Dict[int, dict] = {}
+
+def _make_qr_png_b64(data: str) -> str:
+  """Return a base64 PNG for the provided payload string."""
+  img = qrcode.make(data)
+  buf = io.BytesIO()
+  img.save(buf, format="PNG")
+  return base64.b64encode(buf.getvalue()).decode("ascii")
+
+def _build_demo_qr_payload(txid: int, amount: float) -> str:
+  """
+  Replace this with a real EMVCo/PromptPay string later.
+  For now, an opaque string unique per transaction is fine.
+  """
+  return f"PAYMENT|TX:{txid}|AMT:{amount:.2f}"
+
+
 # ======================================================================
 # Core Sales Logic
 # ======================================================================
@@ -137,13 +163,13 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
     for line in line_summaries:
       cur.execute(
         """
-        INSERT INTO each_transaction (transaction_id, name, price, quantity)
+        INSERT INTO each_transaction (name, transaction_id, price, quantity)
         VALUES (?, ?, ?, ?)
         """,
-        (transaction_id, line["name"], line["unit_price"], line["quantity"]),
+        (line["name"], transaction_id, line["unit_price"], line["quantity"]),
       )
 
-    # Update inventory
+    # Update inventory (note: for real QR flow you may want to defer stock update until 'paid')
     for pid, qty in combined.items():
       cur.execute(
         """
@@ -160,12 +186,26 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
     result = {
       "transaction_id": transaction_id,
       "items": line_summaries,
-      "total_amount": total_amount,
+      "total_amount": float(total_amount),
       "payment_method": payment_method,
       "timestamp": now_str,
     }
     if warnings:
       result["warnings"] = warnings
+
+    # === Attach QR data when payment method is QR ===
+    if payment_method == "qr":
+      # Mark this transaction as 'pending' in memory (swap to DB later)
+      TX_STATUS[transaction_id] = {
+        "status": "pending",
+        "amount": float(total_amount),
+        "created": time.time(),
+      }
+      # Build a payload and PNG QR for the frontend
+      payload = _build_demo_qr_payload(transaction_id, float(total_amount))
+      result["qr_payload"] = payload
+      result["qr_png_base64"] = _make_qr_png_b64(payload)
+      result["expires_in"] = 300  # 5 minutes
 
     return result
 
@@ -174,6 +214,7 @@ def sell_products(items: List[dict], payment_method: str = "cash", low_stock_thr
     return {"error": "db_error", "detail": str(exc)}
   finally:
     conn.close()
+
 
 # ======================================================================
 # Flask Blueprint
@@ -270,3 +311,55 @@ def search_products():
       }
 
   return jsonify([row_to_dict(r) for r in rows]), 200
+
+
+# ======================================================================
+# QR Status / Control Endpoints
+# ======================================================================
+
+@sales_bp.get("/status/<int:transaction_id>")
+def qr_status(transaction_id: int):
+  """
+  Poll current status of a QR transaction.
+  Auto-expires after 5 minutes if still pending.
+  """
+  tx = TX_STATUS.get(transaction_id)
+  if not tx:
+    # If not in memory, treat as unknown (or consult DB if you add a status column there).
+    return jsonify({"status": "unknown"}), 200
+
+  # Auto-expire after 5 minutes
+  if tx["status"] == "pending" and (time.time() - tx["created"] > 300):
+    tx["status"] = "expired"
+  return jsonify({"status": tx["status"], "amount": tx["amount"]}), 200
+
+
+@sales_bp.post("/mark-paid/<int:transaction_id>")
+def qr_mark_paid(transaction_id: int):
+  """
+  Manual test endpoint: mark a QR transaction as paid.
+  In production, this would be triggered by your payment gateway webhook.
+  """
+  tx = TX_STATUS.get(transaction_id)
+  if not tx:
+    # If it's not tracked in memory, you might verify via DB instead.
+    TX_STATUS[transaction_id] = {"status": "paid", "amount": 0.0, "created": time.time()}
+  else:
+    tx["status"] = "paid"
+  return jsonify({"ok": True}), 200
+
+
+@sales_bp.get("/qr.png")
+def qr_png():
+  """
+  Optional helper: render a QR PNG from a text payload.
+  Frontend uses this only if it didn't receive qr_png_base64 directly.
+  """
+  data = (request.args.get("data") or "").strip()
+  if not data:
+    return jsonify({"error": "no_data"}), 400
+  img = qrcode.make(data)
+  buf = io.BytesIO()
+  img.save(buf, format="PNG")
+  buf.seek(0)
+  return send_file(buf, mimetype="image/png")

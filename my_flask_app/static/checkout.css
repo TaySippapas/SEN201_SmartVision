@@ -158,3 +158,12 @@ Date: 14 October 2025
 .omnibox-text { display: flex; flex-direction: column; }
 .omnibox-primary { font-weight: 600; }
 .omnibox-secondary { opacity: 0.8; font-size: 0.85rem; }
+
+
+/* === QR modal === */
+.qr-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000}
+.qr-modal[aria-hidden="false"]{display:flex}
+.qr-dialog{background:#fff;padding:20px;max-width:360px;width:92%;border-radius:12px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.qr-dialog img{width:260px;height:260px;object-fit:contain;margin:8px auto 4px auto}
+.qr-actions{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.qr-status{font-size:.9rem;opacity:.8;margin-top:6px}

@@ -29,6 +29,8 @@ const btnPay = document.querySelector("#pay-button");
 const btnCancel = document.querySelector("#cancel-button");
 const tbody = document.querySelector("#cart-body");
 const totalEl = document.querySelector("#total-amount");
+const btnQrCancel = document.getElementById("qr-cancel");
+const btnQrPaid   = document.getElementById("qr-paid");
 
 // Prefer #product-name; fall back to #product-code for older markup
 const codeOrNameInput =
@@ -50,6 +52,58 @@ let currentData = [];
 
 /* =============================== Constants ============================= */
 const API_SALES = "http://127.0.0.1:5000/api/sales";
+
+/* ============================ QR Helpers ============================== */
+let pollTimer = null;
+
+function openQrModal() {
+  const m = document.getElementById("qr-modal");
+  if (m) m.setAttribute("aria-hidden", "false");
+}
+function closeQrModal() {
+  const m = document.getElementById("qr-modal");
+  if (m) m.setAttribute("aria-hidden", "true");
+  const status = document.getElementById("qr-status");
+  if (status) status.textContent = "Waiting for payment…";
+  if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
+
+function renderQr(result) {
+  const img = document.getElementById("qr-image");
+  const amt = document.getElementById("qr-amount");
+  if (amt) amt.textContent = `Total: $${formatCurrency(result.total_amount)}`;
+
+  if (result.qr_png_base64 && img) {
+    img.src = `data:image/png;base64,${result.qr_png_base64}`;
+  } else if (result.qr_payload && img) {
+    img.src = `${API_SALES}/qr.png?data=${encodeURIComponent(result.qr_payload)}`;
+  } else {
+    throw new Error("No QR returned from server");
+  }
+}
+
+async function pollPayment(transactionId) {
+  const statusEl = document.getElementById("qr-status");
+  pollTimer = setInterval(async () => {
+    try {
+      const r = await fetch(`${API_SALES}/status/${transactionId}`);
+      const { status } = await r.json();
+      if (status === "paid") {
+        if (statusEl) statusEl.textContent = "✅ Payment received";
+        clearInterval(pollTimer); pollTimer = null;
+        setTimeout(() => { closeQrModal(); }, 700);
+        cart = [];
+        renderCart();
+        alert("✅ Sale complete! Payment received.");
+      } else if (status === "expired" || status === "canceled") {
+        if (statusEl) statusEl.textContent = "❌ Payment expired/canceled";
+        clearInterval(pollTimer); pollTimer = null;
+      }
+    } catch (_) {
+      // keep polling silently
+    }
+  }, 2000);
+}
 
 /* ============================ Panel Helpers ============================ */
 function showPanel() {
@@ -326,12 +380,24 @@ btnPay.addEventListener("click", async () => {
 
   try {
     const result = await processCheckout(items, paymentMethod);
+
+    if (paymentMethod === "qr") {
+      // Expect: { transaction_id, total_amount, payment_method, qr_png_base64 || qr_payload }
+      renderQr(result);
+      openQrModal();
+      const btnQrPaid = document.getElementById("qr-paid");
+      if (btnQrPaid) btnQrPaid.dataset.txid = result.transaction_id;
+      await pollPayment(result.transaction_id);
+      // Do NOT clear cart here; poller will clear when paid.
+      return;
+    }
+
+    // Non-QR flow (existing)
     alert(
       `✅ Sale complete!\nTransaction ID: ${result.transaction_id}\nTotal: $${formatCurrency(
         result.total_amount
       )}\nPayment: ${result.payment_method.toUpperCase()}`
     );
-
     if (result.warnings) alert(result.warnings.join("\n"));
 
     cart = [];
@@ -353,5 +419,25 @@ btnCancel.addEventListener("click", () => {
     renderCart();
   }
 });
+
+/* ============================ QR Modal UI ============================= */
+
+if (btnQrCancel) {
+  btnQrCancel.addEventListener("click", () => {
+    // (Optional) you could notify backend to cancel here
+    closeQrModal();
+  });
+}
+if (btnQrPaid) {
+  btnQrPaid.addEventListener("click", async () => {
+    const tx = btnQrPaid.dataset.txid;
+    if (!tx) return closeQrModal();
+    try {
+      await fetch(`${API_SALES}/mark-paid/${tx}`, { method: "POST" });
+      // The poller will see "paid" shortly, or you could force-close here.
+    } catch (_) {}
+  });
+}
+
 
 renderCart();
