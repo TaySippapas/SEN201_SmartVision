@@ -1,5 +1,4 @@
-pragma foreign_keys = on;
-
+-- Table storing information about all products available for sale
 create table product 
 (
   product_id integer primary key autoincrement,
@@ -10,6 +9,7 @@ create table product
   quantity integer not null check(quantity >= 0)
 );
 
+-- Table summarizing each completed transaction
 create table total_transaction 
 (
   transaction_id integer primary key autoincrement,
@@ -18,6 +18,7 @@ create table total_transaction
   payment_method text
 );
 
+-- Table linking each item sold to a transaction record
 create table each_transaction 
 (
   each_transaction_id integer primary key autoincrement,
