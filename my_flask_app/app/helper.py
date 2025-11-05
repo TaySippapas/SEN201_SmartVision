@@ -10,7 +10,7 @@ import os
 import sys
 
 
-def getConnection():
+def get_connection():
     """
     Establish and return a SQLite database connection.
 
@@ -36,3 +36,5 @@ def getConnection():
     except Exception as e:
         print(f'[ERROR] Failed to connect to DB: {e}')
         raise
+
+

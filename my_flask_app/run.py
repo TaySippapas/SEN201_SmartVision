@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from app.management import products_bp 
+from app.management import product_bp 
 from app.sales import sales_bp
 from app.sales_report import sales_report_bp
 import os,sys
@@ -17,7 +17,7 @@ app = Flask(
 )
 DB_PATH = os.path.join(BASE_DIR, "database", "mydatabase.db")
 # Register blueprints
-app.register_blueprint(products_bp)
+app.register_blueprint(product_bp)
 app.register_blueprint(sales_bp)
 app.register_blueprint(sales_report_bp)
 # Frontend routes

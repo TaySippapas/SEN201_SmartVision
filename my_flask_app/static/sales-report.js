@@ -1,3 +1,10 @@
+/* 
+  File: sales-report.js
+  Purpose: Sales report UI logic (summary table, transactions modal, CSV export)
+  Author: Saritwatt
+  Date: 04 Nov 2025
+*/
+
 // Format numbers for currency
 function fmt(n) {
   return Number(n).toLocaleString(undefined, {

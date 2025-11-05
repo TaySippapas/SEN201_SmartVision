@@ -127,10 +127,10 @@ def getAllProducts():
 # -----------------------------
 # Blueprint
 # -----------------------------
-productsBp = Blueprint('products', __name__, url_prefix='/api/products')
+product_bp = Blueprint('products', __name__, url_prefix='/api/products')
 
 
-@productsBp.route('', methods=['GET'])
+@product_bp.route('', methods=['GET'])
 def listProducts():
     """
     Endpoint to list all products in JSON format.
@@ -141,7 +141,7 @@ def listProducts():
         return jsonify({'error': str(e)}), 500
 
 
-@productsBp.route('', methods=['POST'])
+@product_bp.route('', methods=['POST'])
 def addProduct():
     """
     Endpoint to add a new product with JSON payload.
@@ -165,7 +165,7 @@ def addProduct():
         return jsonify({'error': str(e)}), 500
 
 
-@productsBp.route('/<int:productId>', methods=['PUT'])
+@product_bp.route('/<int:productId>', methods=['PUT'])
 def updateProduct(productId):
     """
     Endpoint to update an existing product’s information by productId.
@@ -190,7 +190,7 @@ def updateProduct(productId):
         return jsonify({'error': str(e)}), 500
 
 
-@productsBp.route('/<int:productId>', methods=['DELETE'])
+@product_bp.route('/<int:productId>', methods=['DELETE'])
 def removeProduct(productId):
     """
     Endpoint to delete a product by productId.
