@@ -14,17 +14,18 @@
 </head>
 <body>
   <header class="app-bar"><h1 class="brand">SmartVision POS</h1></header>
-
+    
   <main class="container">
     <h2 class="page-title">Inventory Report</h2>
     <p class="page-subtitle">Current stock levels and valuation</p>
 
+    <!-- Toolbar -->
     <div class="toolbar">
       <label><input id="only-low" type="checkbox" /> Show low/out-of-stock only</label>
       <button id="btn-export-inv" class="btn btn-primary">Export CSV</button>
       <a href="reports.html" class="btn" aria-label="Back">Back</a>
     </div>
-
+    <!-- Inventory Table -->
     <section class="table-wrap">
       <table id="inv-table">
         <thead>

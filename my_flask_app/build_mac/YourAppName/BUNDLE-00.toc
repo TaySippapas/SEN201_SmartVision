@@ -1,0 +1,4 @@
+([('YourAppName',
+   '/Users/saritwatt/Desktop/Software '
+   'Sally/SEN201_SmartVision/my_flask_app/dist_mac/YourAppName',
+   'EXECUTABLE')],)

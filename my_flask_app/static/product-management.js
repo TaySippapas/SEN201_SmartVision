@@ -1,16 +1,21 @@
 /* 
   File: product-management.js
   Purpose: Control product CRUD actions via Flask backend API
-  Author: Saritwatt (updated by ChatGPT)
+  Author: Saritwatt
+  Date: 04 Nov 2025
 */
 
-/* utilities */
+
+
+/* Format a number as localized currency-like string */
 function currency(n) {
   return Number(n).toLocaleString(undefined, {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 }
+
+/* Compute stock badge label/level from a product object. */
 function computeStatus(p) {
   if (p.quantity <= 0) return { label: "out of stock", level: "danger" };
   if (p.quantity <= 10) return { label: "low stock", level: "warning" };
@@ -37,11 +42,13 @@ let editingProduct = null;
 /* API helpers */
 const API_BASE = "http://127.0.0.1:5000/api/products";
 
+/* Fetch all products from API */
 async function fetchProducts() {
   const res = await fetch(API_BASE);
   return res.ok ? await res.json() : [];
 }
 
+/* Create a new product */
 async function createProduct(data) {
   const res = await fetch(API_BASE, {
     method: "POST",
@@ -51,6 +58,7 @@ async function createProduct(data) {
   return await res.json();
 }
 
+/* Update an existing product by id */
 async function updateProduct(id, data) {
   const res = await fetch(`${API_BASE}/${id}`, {
     method: "PUT",
@@ -60,6 +68,7 @@ async function updateProduct(id, data) {
   return await res.json();
 }
 
+/* Delete a product by id with confirmation */
 async function deleteProduct(id) {
   const ok = confirm("Delete product ID " + id + "?");
   if (!ok) return;
@@ -171,8 +180,10 @@ modal.addEventListener("click", (e) => {
 modalClose.addEventListener("click", closeModal);
 btnCancel.addEventListener("click", closeModal);
 
-/* handlers */
+/* Open create modal */
 btnCreate.addEventListener("click", () => openModal("create"));
+
+/* Filter rows as the user types */
 searchInput.addEventListener("input", (e) => renderRows(e.target.value));
 
 form.addEventListener("submit", async (e) => {
