@@ -54,7 +54,8 @@ Date: 14 October 2025
 }
 
 /* Quantity input */
-.quantity-input {
+.quantity-input,
+.qty-input {
     width: 70px;
     padding: 0.4rem;
     text-align: center;
@@ -109,7 +110,8 @@ Date: 14 October 2025
 }
 
 /* each row */
-.omnibox-item {
+.omnibox-item,
+.suggestion-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -120,7 +122,9 @@ Date: 14 October 2025
 }
 
 .omnibox-item:hover,
-.omnibox-item.is-active {
+.omnibox-item.is-active,
+.suggestion-item:hover,
+.suggestion-item.is-active {
   background: rgba(255,255,255,0.08);
 }
 

@@ -14,10 +14,10 @@
 
   <!-- If you open this file directly, keep plain paths below. If you serve via Flask templates,
        you can switch to url_for('static', ...). -->
-  <link rel="stylesheet" href="static/main.css" />
-  <link rel="stylesheet" href="static/checkout.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='checkout.css') }}" />
 
-  <script src="static/checkout.js" defer></script>
+  <script src="{{ url_for('static', filename='checkout.js') }}" defer></script>
 </head>
 <body>
 
