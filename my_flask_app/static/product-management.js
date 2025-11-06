@@ -8,15 +8,18 @@
 
 
 /* Format a number as localized currency-like string */
-function currency(n) {
-  return Number(n).toLocaleString(undefined, {
+function currency(n) 
+{
+  return Number(n).toLocaleString(undefined, 
+  {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 }
 
 /* Compute stock badge label/level from a product object. */
-function computeStatus(p) {
+function computeStatus(p) 
+{
   if (p.quantity <= 0) return { label: "out of stock", level: "danger" };
   if (p.quantity <= 10) return { label: "low stock", level: "warning" };
   return { label: "in stock", level: "success" };
@@ -43,14 +46,17 @@ let editingProduct = null;
 const API_BASE = "http://127.0.0.1:5000/api/products";
 
 /* Fetch all products from API */
-async function fetchProducts() {
+async function fetchProducts() 
+{
   const res = await fetch(API_BASE);
   return res.ok ? await res.json() : [];
 }
 
 /* Create a new product */
-async function createProduct(data) {
-  const res = await fetch(API_BASE, {
+async function createProduct(data) 
+{
+  const res = await fetch(API_BASE, 
+  {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -59,8 +65,10 @@ async function createProduct(data) {
 }
 
 /* Update an existing product by id */
-async function updateProduct(id, data) {
-  const res = await fetch(`${API_BASE}/${id}`, {
+async function updateProduct(id, data) 
+{
+  const res = await fetch(`${API_BASE}/${id}`, 
+  {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -69,7 +77,8 @@ async function updateProduct(id, data) {
 }
 
 /* Delete a product by id with confirmation */
-async function deleteProduct(id) {
+async function deleteProduct(id) 
+{
   const ok = confirm("Delete product ID " + id + "?");
   if (!ok) return;
 
@@ -78,7 +87,8 @@ async function deleteProduct(id) {
 }
 
 /* rendering */
-async function renderRows(filterText = "") {
+async function renderRows(filterText = "") 
+{
   const products = await fetchProducts();
   const q = filterText.trim().toLowerCase();
   const list = q
@@ -89,13 +99,15 @@ async function renderRows(filterText = "") {
     : products;
 
   tbody.innerHTML = "";
-  if (list.length === 0) {
+  if (list.length === 0) 
+  {
     emptyState.hidden = false;
     return;
   }
   emptyState.hidden = true;
 
-  list.forEach((p) => {
+  list.forEach((p) => 
+  {
     const tr = document.createElement("tr");
 
     const tdId = document.createElement("td");
@@ -149,15 +161,19 @@ async function renderRows(filterText = "") {
 }
 
 /* modal control */
-function openModal(mode, product = null) {
+function openModal(mode, product = null) 
+{
   modal.hidden = false;
   document.body.style.overflow = "hidden";
 
-  if (mode === "create") {
+  if (mode === "create") 
+  {
     modalTitle.textContent = "Create Product";
     form.reset();
     editingProduct = null;
-  } else {
+  } 
+  else 
+  {
     modalTitle.textContent = "Edit Product";
     form.name.value = product.name;
     form.description.value = product.description;
@@ -169,12 +185,14 @@ function openModal(mode, product = null) {
   form.name.focus();
 }
 
-function closeModal() {
+function closeModal() 
+{
   modal.hidden = true;
   document.body.style.overflow = "";
 }
 
-modal.addEventListener("click", (e) => {
+modal.addEventListener("click", (e) => 
+{
   if (e.target.classList.contains("modal-backdrop")) closeModal();
 });
 modalClose.addEventListener("click", closeModal);
@@ -186,23 +204,29 @@ btnCreate.addEventListener("click", () => openModal("create"));
 /* Filter rows as the user types */
 searchInput.addEventListener("input", (e) => renderRows(e.target.value));
 
-form.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async (e) => 
+{
   e.preventDefault();
-  const data = {
+  const data = 
+  {
     name: form.name.value.trim(),
     description: form.description.value.trim(),
     price: Number(form.price.value),
     quantity: Number(form.quantity.value),
   };
 
-  if (data.price <= 0) {
+  if (data.price <= 0) 
+    {
     alert("Price must be greater than 0.");
     return; // stop form submission
   }
 
-  if (editingProduct === null) {
+  if (editingProduct === null) 
+    {
     await createProduct(data);
-  } else {
+  } 
+  else 
+  {
     await updateProduct(editingProduct.product_id, data);
   }
 
@@ -211,7 +235,8 @@ form.addEventListener("submit", async (e) => {
 });
 
 /* export csv */
-btnExport.addEventListener("click", async () => {
+btnExport.addEventListener("click", async () => 
+{
   const products = await fetchProducts();
   const header = ["product_id", "name", "description", "price", "quantity"];
   const lines = [header.join(",")].concat(

@@ -6,14 +6,17 @@
 */
 
 // Format numbers for currency
-function fmt(n) {
-  return Number(n).toLocaleString(undefined, {
+function fmt(n) 
+{
+  return Number(n).toLocaleString(undefined, 
+    {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => 
+  {
   const from = document.getElementById("from");
   const to = document.getElementById("to");
   const group = document.getElementById("group");
@@ -35,20 +38,25 @@ document.addEventListener("DOMContentLoaded", () => {
   // --------------------
   // Load summary report data
   // --------------------
-  async function loadSummaryReport() {
-    const params = new URLSearchParams({
+  async function loadSummaryReport() 
+  {
+    const params = new URLSearchParams
+    ({
       from: from.value,
       to: to.value,
       group: group.value,
     });
 
-    try {
+    try 
+    {
       const response = await fetch(`/sales-report/report-json?${params.toString()}`);
       if (!response.ok) throw new Error("Failed to load sales report.");
       const data = await response.json();
       currentSummaryData = data;
       renderSummaryTable(data);
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       console.error(err);
       tbodySummary.innerHTML = `<tr><td colspan="4" class="text-center">Error loading sales report</td></tr>`;
     }
@@ -57,14 +65,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // --------------------
   // Render summary table with "View Transactions" button
   // --------------------
-  function renderSummaryTable(data) {
+  function renderSummaryTable(data) 
+  {
     tbodySummary.innerHTML = "";
-    if (!data.length) {
+    if (!data.length) 
+      {
       tbodySummary.innerHTML = `<tr><td colspan="4" class="text-center">No data found for selected range</td></tr>`;
       return;
     }
 
-    data.forEach(row => {
+    data.forEach(row => 
+      {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${row.period}</td>
@@ -91,8 +102,10 @@ document.addEventListener("DOMContentLoaded", () => {
     tbodyTransactions.innerHTML = `<tr><td colspan="4" class="text-center">Loading...</td></tr>`;
     modal.style.display = "block";
 
-    try {
-      const params = new URLSearchParams({
+    try 
+    {
+      const params = new URLSearchParams
+      ({
         from: from.value,
         to: to.value
       });
@@ -103,13 +116,15 @@ document.addEventListener("DOMContentLoaded", () => {
       // Filter only items for the selected day
       const filtered = data.filter(item => item.period === period);
 
-      if (!filtered.length) {
+      if (!filtered.length) 
+      {
         tbodyTransactions.innerHTML = `<tr><td colspan="4" class="text-center">No transactions found</td></tr>`;
         return;
       }
 
       tbodyTransactions.innerHTML = "";
-      filtered.forEach(item => {
+      filtered.forEach(item => 
+      {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${item.name}</td>
@@ -120,7 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
         tbodyTransactions.appendChild(tr);
       });
 
-    } catch (err) {
+    } 
+    catch (err) 
+    {
       console.error(err);
       tbodyTransactions.innerHTML = `<tr><td colspan="4" class="text-center">Error loading transactions</td></tr>`;
     }
@@ -140,7 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // --------------------
   // Export summary table as CSV
   // --------------------
-  btnExport.addEventListener("click", () => {
+  btnExport.addEventListener("click", () => 
+  {
     if (!currentSummaryData.length) { alert("No data available to export."); return; }
 
     const header = ["Period", "Quantity Sold", "Total Amount"];
