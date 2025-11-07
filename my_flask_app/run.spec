@@ -3,7 +3,7 @@
 
 a = Analysis(
     ['run.py'],
-    pathex=[],
+    pathex=['app'],
     binaries=[],
     datas=[('templates', 'templates'), ('static', 'static'), ('database', 'database')],
     hiddenimports=[],
