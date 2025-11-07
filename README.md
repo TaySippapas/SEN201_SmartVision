@@ -95,3 +95,8 @@ cd dist_window
 cd dist_linux
 chmod +x run
 ./run
+
+## Mac
+cd  dist_mac
+open YourAppName.app
+./YourAppName
