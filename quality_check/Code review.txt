@@ -1,0 +1,140 @@
+﻿Code Review:  sales.py
+Author: Jirat Kositchaiwat (Time)
+Reviewer: Sarittwat Khanthakamolmart (Teak), Jirapat Kulruchakorn (Mew)
+Scribe: Sippapas Pronanunt (Tay)
+Overview
+
+
+This module handles the entire transaction flow for the system from validating an input product, checking product quantity, calculating total sale price, updating inventory stock, and record transactions in the database.
+
+
+The structure is divided into:
+1. Utility Functions  – validation and data processing.  
+2. Core Sales Logic  – executes database transactions and updates inventory.  
+3. Flask Blueprint – exposes an API endpoint for frontend integration.
+
+
+Main Components
+1. combine_items()
+Validates the sales input list, merges duplicate items, and ensures quantities are positive.  
+Returns a dictionary of or an error object.
+
+
+2. fetch_products()
+Fetches product data (name, price, quantity, total_sales) from the database.  
+Detects and reports missing product.
+
+
+3. check_stock()
+Ensures requested quantities do not exceed available stock.  
+Returns an error if a product is out of stock.
+
+
+4. calc_lines_and_total()
+Generates product sales summaries and calculates the total transaction amount.  
+Each line includes product name, unit price, quantity, and subtotal.
+
+
+5.  sell_products()
+Central function performing the full transaction flow:
+* Validates and combines item input.
+*  Fetches product info.
+* Checks inventory and updates stock.
+*  Inserts transaction header and lines into the database.
+* Returns JSON-ready response to the API layer.
+
+
+6.  Flask Blueprint: sales_bp
+Defines the `/api/sales/checkout` route, which:
+* Accepts JSON 
+* Calls function sell_products()
+* Returns transaction results or error responses as JSON.
+
+
+
+
+Overview
+The team noted that the module demonstrates clear modular structure, strong adherence to Python best practices, and good type safety. The design separates helper utilities, core logic, and Flask endpoints effectively. Code readability and maintainability were rated as strong due to consistent naming conventions, structured comments, and descriptive docstrings. The reviewers also appreciated defensive programming practices such as input validation and transaction rollback on database errors.
+
+
+Issue 1: SQL Injection Risk in Dynamic Placeholder Construction
+
+
+placeholders = ",".join(["?"] * len(product_ids))
+cur.execute(
+    f"""
+      SELECT product_id, name, price, quantity, total_sales
+      FROM product
+      WHERE product_id IN ({placeholders})
+    """,
+    list(product_ids),
+)
+
+
+
+
+	
+
+While placeholders are used properly, constructing SQL with an f-string could be risky in future modifications. Reviewers recommended enforcing strict validation of product_ids or using safe query-building utilities.
+
+
+
+
+
+
+
+
+
+
+Issue 2: Missing Context Manager for Database Connection
+
+
+
+
+conn = get_connection()
+try:
+    cur = conn.cursor()
+    ...
+finally:
+    conn.close()
+	
+
+Manual connection handling may cause resource leaks. It was suggested to refactor database interactions using context managers such as:
+
+
+with get_connection() as conn:
+    cur = conn.cursor()
+    ...
+
+
+
+
+	
+
+Issue 3: In-Memory Transaction Tracking (TX_STATUS)
+
+
+TX_STATUS: Dict[int, dict] = {}
+
+
+	
+
+Currently, transaction statuses are tracked in memory and lost upon server restart. Reviewers recommended migrating to a persistent database or caching system (e.g., Redis) to maintain transaction integrity for QR payments.
+
+
+Issue 4: Lack of Concurrency Handling in Stock Updates
+
+
+UPDATE product
+SET quantity = quantity - ?, total_sales = total_sales + ?
+WHERE product_id = ?
+
+
+
+
+	
+
+Positive Observations
+The module is well-organized with clear logical boundaries and strong type annotations. Inline documentation enhances maintainability, and overall error handling demonstrates careful design. The reviewers noted that the system’s architecture is flexible enough to support additional payment methods or backend integrations with minimal modification.
+Conclusion
+The sales.py module is well-structured and production-ready with minor improvements suggested for database safety, persistence, and test coverage. The team concluded that the implementation aligns with Flask design standards and follows sound software engineering principles.
